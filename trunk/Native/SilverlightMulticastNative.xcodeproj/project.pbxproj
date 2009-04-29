@@ -1,0 +1,490 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		69075BC20F6AF8530077DB2A /* Logger.h in Headers */ = {isa = PBXBuildFile; fileRef = 69075B960F6AF67F0077DB2A /* Logger.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		69075BC40F6AF87D0077DB2A /* MulticastCallback.h in Headers */ = {isa = PBXBuildFile; fileRef = 69075B970F6AF67F0077DB2A /* MulticastCallback.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		69075BC60F6AF88B0077DB2A /* MulticastReceiver.h in Headers */ = {isa = PBXBuildFile; fileRef = 69075B9B0F6AF67F0077DB2A /* MulticastReceiver.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		69075BC70F6AF8910077DB2A /* RingBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 69075B9D0F6AF67F0077DB2A /* RingBuffer.cpp */; };
+		69075BC80F6AF8960077DB2A /* RingBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 69075B9E0F6AF67F0077DB2A /* RingBuffer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		69075DE80F70435D0077DB2A /* np_entry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 69075CC40F7012910077DB2A /* np_entry.cpp */; };
+		69075DE90F70435D0077DB2A /* npn_gate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 69075CC50F7012910077DB2A /* npn_gate.cpp */; };
+		69075DEA0F70435D0077DB2A /* npp_gate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 69075CC60F7012910077DB2A /* npp_gate.cpp */; };
+		69075DEB0F70435D0077DB2A /* plugin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 69075CC70F7012910077DB2A /* plugin.cpp */; };
+		69075DEC0F70435D0077DB2A /* scriptableobject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 69075CCA0F7012910077DB2A /* scriptableobject.cpp */; };
+		69075DFC0F7043910077DB2A /* libMulticastLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 69075BA70F6AF6F10077DB2A /* libMulticastLib.a */; };
+		6907613A0F71790A0077DB2A /* MulticastProxyNP.r in Rez */ = {isa = PBXBuildFile; fileRef = 690761200F716E490077DB2A /* MulticastProxyNP.r */; };
+		696D48C90F94040F00452890 /* MulticastReceiverImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 696D477A0F93C65800452890 /* MulticastReceiverImpl.cpp */; };
+		69AFB12E0F71D00500FC07B7 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 69075D280F701EDB0077DB2A /* Info.plist */; };
+		69AFB1B90F71E08800FC07B7 /* MulticastLibTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 69AFB1B10F71E04800FC07B7 /* MulticastLibTest.cpp */; };
+		69AFB1E80F71E1F100FC07B7 /* libMulticastLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 69075BA70F6AF6F10077DB2A /* libMulticastLib.a */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		69075DCB0F7038DE0077DB2A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 69075B8C0F6AF6330077DB2A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 69075BA60F6AF6F10077DB2A;
+			remoteInfo = MulticastLib;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		69075B960F6AF67F0077DB2A /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Logger.h; path = MulticastLib/Logger.h; sourceTree = "<group>"; };
+		69075B970F6AF67F0077DB2A /* MulticastCallback.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MulticastCallback.h; path = MulticastLib/MulticastCallback.h; sourceTree = "<group>"; };
+		69075B9B0F6AF67F0077DB2A /* MulticastReceiver.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MulticastReceiver.h; path = MulticastLib/MulticastReceiver.h; sourceTree = "<group>"; };
+		69075B9C0F6AF67F0077DB2A /* ReadMe.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = ReadMe.txt; path = MulticastLib/ReadMe.txt; sourceTree = "<group>"; };
+		69075B9D0F6AF67F0077DB2A /* RingBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = RingBuffer.cpp; path = MulticastLib/RingBuffer.cpp; sourceTree = "<group>"; };
+		69075B9E0F6AF67F0077DB2A /* RingBuffer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = RingBuffer.h; path = MulticastLib/RingBuffer.h; sourceTree = "<group>"; };
+		69075BA70F6AF6F10077DB2A /* libMulticastLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMulticastLib.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		69075CC40F7012910077DB2A /* np_entry.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = np_entry.cpp; path = MulticastProxyNP/np_entry.cpp; sourceTree = "<group>"; };
+		69075CC50F7012910077DB2A /* npn_gate.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = npn_gate.cpp; path = MulticastProxyNP/npn_gate.cpp; sourceTree = "<group>"; };
+		69075CC60F7012910077DB2A /* npp_gate.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = npp_gate.cpp; path = MulticastProxyNP/npp_gate.cpp; sourceTree = "<group>"; };
+		69075CC70F7012910077DB2A /* plugin.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = plugin.cpp; path = MulticastProxyNP/plugin.cpp; sourceTree = "<group>"; };
+		69075CC80F7012910077DB2A /* plugin.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = plugin.h; path = MulticastProxyNP/plugin.h; sourceTree = "<group>"; };
+		69075CC90F7012910077DB2A /* resource.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = resource.h; path = MulticastProxyNP/resource.h; sourceTree = "<group>"; };
+		69075CCA0F7012910077DB2A /* scriptableobject.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = scriptableobject.cpp; path = MulticastProxyNP/scriptableobject.cpp; sourceTree = "<group>"; };
+		69075CCB0F7012910077DB2A /* scriptableobject.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = scriptableobject.h; path = MulticastProxyNP/scriptableobject.h; sourceTree = "<group>"; };
+		69075D280F701EDB0077DB2A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; name = Info.plist; path = MulticastProxyNP/Info.plist; sourceTree = "<group>"; };
+		69075DC50F7038B60077DB2A /* MulticastProxyNP.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MulticastProxyNP.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		6907610A0F716AA30077DB2A /* English */ = {isa = PBXFileReference; explicitFileType = sourcecode.rez; fileEncoding = 4; name = English; path = MulticastProxyNP/English.lproj/MulticastProxyNP.r; sourceTree = "<group>"; };
+		696D47790F93C65800452890 /* MulticastLibCommon.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MulticastLibCommon.h; path = MulticastLib/MulticastLibCommon.h; sourceTree = "<group>"; };
+		696D477A0F93C65800452890 /* MulticastReceiverImpl.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = MulticastReceiverImpl.cpp; path = MulticastLib/MulticastReceiverImpl.cpp; sourceTree = "<group>"; };
+		696D477B0F93C65800452890 /* MulticastReceiverImpl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MulticastReceiverImpl.h; path = MulticastLib/MulticastReceiverImpl.h; sourceTree = "<group>"; };
+		69AFB1B10F71E04800FC07B7 /* MulticastLibTest.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = MulticastLibTest.cpp; path = MulticastLibTest/MulticastLibTest.cpp; sourceTree = "<group>"; };
+		69AFB1B70F71E07200FC07B7 /* MulticastLibTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MulticastLibTest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		69075BA50F6AF6F10077DB2A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		69075DC30F7038B60077DB2A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				69075DFC0F7043910077DB2A /* libMulticastLib.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		69AFB1B50F71E07200FC07B7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				69AFB1E80F71E1F100FC07B7 /* libMulticastLib.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		69075B8A0F6AF6330077DB2A = {
+			isa = PBXGroup;
+			children = (
+				69AFB1B20F71E04B00FC07B7 /* MulticastLibTest */,
+				69075CCC0F7012960077DB2A /* MulticastProxyNP */,
+				69075BC30F6AF85C0077DB2A /* MulticastLib */,
+				69075BA80F6AF6F10077DB2A /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		69075BA80F6AF6F10077DB2A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				69075BA70F6AF6F10077DB2A /* libMulticastLib.a */,
+				69075DC50F7038B60077DB2A /* MulticastProxyNP.bundle */,
+				69AFB1B70F71E07200FC07B7 /* MulticastLibTest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		69075BC30F6AF85C0077DB2A /* MulticastLib */ = {
+			isa = PBXGroup;
+			children = (
+				696D47790F93C65800452890 /* MulticastLibCommon.h */,
+				696D477A0F93C65800452890 /* MulticastReceiverImpl.cpp */,
+				696D477B0F93C65800452890 /* MulticastReceiverImpl.h */,
+				69075B960F6AF67F0077DB2A /* Logger.h */,
+				69075B970F6AF67F0077DB2A /* MulticastCallback.h */,
+				69075B9B0F6AF67F0077DB2A /* MulticastReceiver.h */,
+				69075B9C0F6AF67F0077DB2A /* ReadMe.txt */,
+				69075B9D0F6AF67F0077DB2A /* RingBuffer.cpp */,
+				69075B9E0F6AF67F0077DB2A /* RingBuffer.h */,
+			);
+			name = MulticastLib;
+			sourceTree = "<group>";
+		};
+		69075CCC0F7012960077DB2A /* MulticastProxyNP */ = {
+			isa = PBXGroup;
+			children = (
+				69075CC40F7012910077DB2A /* np_entry.cpp */,
+				69075CC50F7012910077DB2A /* npn_gate.cpp */,
+				69075CC60F7012910077DB2A /* npp_gate.cpp */,
+				69075CC70F7012910077DB2A /* plugin.cpp */,
+				69075CC80F7012910077DB2A /* plugin.h */,
+				69075CC90F7012910077DB2A /* resource.h */,
+				69075CCA0F7012910077DB2A /* scriptableobject.cpp */,
+				69075CCB0F7012910077DB2A /* scriptableobject.h */,
+				69075D280F701EDB0077DB2A /* Info.plist */,
+				690761200F716E490077DB2A /* MulticastProxyNP.r */,
+			);
+			name = MulticastProxyNP;
+			sourceTree = "<group>";
+		};
+		69AFB1B20F71E04B00FC07B7 /* MulticastLibTest */ = {
+			isa = PBXGroup;
+			children = (
+				69AFB1B10F71E04800FC07B7 /* MulticastLibTest.cpp */,
+			);
+			name = MulticastLibTest;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		69075BA30F6AF6F10077DB2A /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				69075BC20F6AF8530077DB2A /* Logger.h in Headers */,
+				69075BC40F6AF87D0077DB2A /* MulticastCallback.h in Headers */,
+				69075BC60F6AF88B0077DB2A /* MulticastReceiver.h in Headers */,
+				69075BC80F6AF8960077DB2A /* RingBuffer.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		69075BA60F6AF6F10077DB2A /* MulticastLib */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 69075BA90F6AF6F10077DB2A /* Build configuration list for PBXNativeTarget "MulticastLib" */;
+			buildPhases = (
+				69075BA30F6AF6F10077DB2A /* Headers */,
+				69075BA40F6AF6F10077DB2A /* Sources */,
+				69075BA50F6AF6F10077DB2A /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MulticastLib;
+			productName = MulticastLib;
+			productReference = 69075BA70F6AF6F10077DB2A /* libMulticastLib.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		69075DC40F7038B60077DB2A /* MulticastProxyNP */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 69075DC70F7038B70077DB2A /* Build configuration list for PBXNativeTarget "MulticastProxyNP" */;
+			buildPhases = (
+				69075DC10F7038B60077DB2A /* Resources */,
+				69075DC20F7038B60077DB2A /* Sources */,
+				69075DC30F7038B60077DB2A /* Frameworks */,
+				690761380F7178F90077DB2A /* Rez */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				69075DCC0F7038DE0077DB2A /* PBXTargetDependency */,
+			);
+			name = MulticastProxyNP;
+			productName = MulticastProxyNP;
+			productReference = 69075DC50F7038B60077DB2A /* MulticastProxyNP.bundle */;
+			productType = "com.apple.product-type.bundle";
+		};
+		69AFB1B60F71E07200FC07B7 /* MulticastLibTest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 69AFB1C10F71E0B800FC07B7 /* Build configuration list for PBXNativeTarget "MulticastLibTest" */;
+			buildPhases = (
+				69AFB1B40F71E07200FC07B7 /* Sources */,
+				69AFB1B50F71E07200FC07B7 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MulticastLibTest;
+			productName = MulticastLibTest;
+			productReference = 69AFB1B70F71E07200FC07B7 /* MulticastLibTest */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		69075B8C0F6AF6330077DB2A /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 69075B8D0F6AF6330077DB2A /* Build configuration list for PBXProject "SilverlightMulticastNative" */;
+			hasScannedForEncodings = 0;
+			mainGroup = 69075B8A0F6AF6330077DB2A;
+			productRefGroup = 69075BA80F6AF6F10077DB2A /* Products */;
+			projectDirPath = "";
+			targets = (
+				69075BA60F6AF6F10077DB2A /* MulticastLib */,
+				69075DC40F7038B60077DB2A /* MulticastProxyNP */,
+				69AFB1B60F71E07200FC07B7 /* MulticastLibTest */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		69075DC10F7038B60077DB2A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				69AFB12E0F71D00500FC07B7 /* Info.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXRezBuildPhase section */
+		690761380F7178F90077DB2A /* Rez */ = {
+			isa = PBXRezBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6907613A0F71790A0077DB2A /* MulticastProxyNP.r in Rez */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXRezBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		69075BA40F6AF6F10077DB2A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				69075BC70F6AF8910077DB2A /* RingBuffer.cpp in Sources */,
+				696D48C90F94040F00452890 /* MulticastReceiverImpl.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		69075DC20F7038B60077DB2A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				69075DE80F70435D0077DB2A /* np_entry.cpp in Sources */,
+				69075DE90F70435D0077DB2A /* npn_gate.cpp in Sources */,
+				69075DEA0F70435D0077DB2A /* npp_gate.cpp in Sources */,
+				69075DEB0F70435D0077DB2A /* plugin.cpp in Sources */,
+				69075DEC0F70435D0077DB2A /* scriptableobject.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		69AFB1B40F71E07200FC07B7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				69AFB1B90F71E08800FC07B7 /* MulticastLibTest.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		69075DCC0F7038DE0077DB2A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 69075BA60F6AF6F10077DB2A /* MulticastLib */;
+			targetProxy = 69075DCB0F7038DE0077DB2A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		690761200F716E490077DB2A /* MulticastProxyNP.r */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6907610A0F716AA30077DB2A /* English */,
+			);
+			name = MulticastProxyNP.r;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		69075B8E0F6AF6330077DB2A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					PLAT_MAC,
+					"XP_MACOSX=1",
+				);
+			};
+			name = Debug;
+		};
+		69075B8F0F6AF6330077DB2A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					PLAT_MAC,
+					"XP_MACOSX=1",
+				);
+			};
+			name = Release;
+		};
+		69075BAA0F6AF6F10077DB2A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/build/Debug\"";
+				PREBINDING = NO;
+				PRODUCT_NAME = MulticastLib;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		69075BAB0F6AF6F10077DB2A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = MulticastLib;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		69075DC80F7038B70077DB2A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = MulticastProxyNP/Info.plist;
+				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Carbon,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = MulticastProxyNP;
+				WRAPPER_EXTENSION = bundle;
+				ZERO_LINK = NO;
+			};
+			name = Debug;
+		};
+		69075DC90F7038B70077DB2A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = MulticastProxyNP/Info.plist;
+				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Carbon,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = MulticastProxyNP;
+				WRAPPER_EXTENSION = bundle;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		69AFB1C20F71E0B800FC07B7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = YES;
+				PRODUCT_NAME = MulticastLibTest;
+				ZERO_LINK = NO;
+			};
+			name = Debug;
+		};
+		69AFB1C30F71E0B800FC07B7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = YES;
+				PRODUCT_NAME = MulticastLibTest;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		69075B8D0F6AF6330077DB2A /* Build configuration list for PBXProject "SilverlightMulticastNative" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				69075B8E0F6AF6330077DB2A /* Debug */,
+				69075B8F0F6AF6330077DB2A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		69075BA90F6AF6F10077DB2A /* Build configuration list for PBXNativeTarget "MulticastLib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				69075BAA0F6AF6F10077DB2A /* Debug */,
+				69075BAB0F6AF6F10077DB2A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		69075DC70F7038B70077DB2A /* Build configuration list for PBXNativeTarget "MulticastProxyNP" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				69075DC80F7038B70077DB2A /* Debug */,
+				69075DC90F7038B70077DB2A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		69AFB1C10F71E0B800FC07B7 /* Build configuration list for PBXNativeTarget "MulticastLibTest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				69AFB1C20F71E0B800FC07B7 /* Debug */,
+				69AFB1C30F71E0B800FC07B7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 69075B8C0F6AF6330077DB2A /* Project object */;
+}
