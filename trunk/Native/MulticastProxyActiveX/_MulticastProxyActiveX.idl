@@ -1,0 +1,43 @@
+import "C:\Program Files\Microsoft Visual Studio 8\VC\PlatformSDK\include\prsht.idl";
+import "C:\Program Files\Microsoft Visual Studio 8\VC\PlatformSDK\include\mshtml.idl";
+import "c:\program files\microsoft visual studio 8\vc\platformsdk\include\dimm.idl";
+import "C:\Program Files\Microsoft Visual Studio 8\VC\PlatformSDK\include\mshtmhst.idl";
+import "c:\program files\microsoft visual studio 8\vc\platformsdk\include\docobj.idl";
+import "C:\Program Files\Microsoft Visual Studio 8\VC\PlatformSDK\include\exdisp.idl";
+import "C:\Program Files\Microsoft Visual Studio 8\VC\PlatformSDK\include\objsafe.idl";
+
+[
+	object,
+	uuid(FD7B677B-6749-4574-93E9-EE2CF1458D50),
+	dual,
+	helpstring("IMulticastProxy Interface"),
+	pointer_default(unique)
+] 
+#line 20 "c:\\documents and settings\\mpoindexter\\my documents\\visual studio 2005\\projects\\multicastnative\\multicastproxyactivex\\multicastproxy.h"
+interface IMulticastProxy : IDispatch {
+#line 22 "c:\\documents and settings\\mpoindexter\\my documents\\visual studio 2005\\projects\\multicastnative\\multicastproxyactivex\\multicastproxy.h"
+	[id(1),helpstring("method StartStreaming")] HRESULT  StartStreaming([in] BSTR multicastGroup, [in] USHORT multicastPort, [in] IDispatch *target);
+	[id(2),helpstring("method StopStreaming")] HRESULT  StopStreaming();
+	[id(3),helpstring("method Test")] HRESULT  Test([in] BSTR message);
+	[id(4),helpstring("method FetchNSC")] HRESULT  FetchNSC([in] BSTR nscFileUrl, [out,retval] BSTR *nscContent);
+};
+
+
+[ version(1.0), uuid(BA9A5D7B-0E68-440E-AD1B-76EDBA719F46), helpstring("MulticastProxyActiveX 1.0 Type Library") ]
+library MulticastProxyActiveX
+{
+	importlib("stdole2.tlb");
+	importlib("olepro32.dll");
+
+	[
+		version(1.0),
+		uuid(5CCEF05B-17B2-48F0-A577-CC019FE455D7),
+		helpstring("MulticastProxy Class")
+	] 
+#line 223 "c:\\documents and settings\\mpoindexter\\my documents\\visual studio 2005\\projects\\multicastnative\\multicastproxyactivex\\multicastproxy.h"
+	coclass CMulticastProxy {
+		[default]	interface IMulticastProxy;
+	};
+
+}
+
