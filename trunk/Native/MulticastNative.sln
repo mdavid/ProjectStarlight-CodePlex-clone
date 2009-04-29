@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MulticastLib", "MulticastLib\MulticastLib.vcproj", "{BE826DD9-1E09-4242-9ACD-330D29925FC0}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MulticastLibTest", "MulticastLibTest\MulticastLibTest.vcproj", "{AA3E61EA-D55E-4AA7-9EA0-A31EDDA948CC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MulticastProxyActiveX", "MulticastProxyActiveX\MulticastProxyActiveX.vcproj", "{31CA2F25-DB07-4F2D-A1C7-61B55555501F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MulticastProxyNP", "MulticastProxyNP\MulticastProxyNP.vcproj", "{1ADA30F0-F2E3-4B3F-8063-6A23B55EFE9F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BE826DD9-1E09-4242-9ACD-330D29925FC0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BE826DD9-1E09-4242-9ACD-330D29925FC0}.Debug|Win32.Build.0 = Debug|Win32
+		{BE826DD9-1E09-4242-9ACD-330D29925FC0}.Release|Win32.ActiveCfg = Release|Win32
+		{BE826DD9-1E09-4242-9ACD-330D29925FC0}.Release|Win32.Build.0 = Release|Win32
+		{AA3E61EA-D55E-4AA7-9EA0-A31EDDA948CC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{AA3E61EA-D55E-4AA7-9EA0-A31EDDA948CC}.Debug|Win32.Build.0 = Debug|Win32
+		{AA3E61EA-D55E-4AA7-9EA0-A31EDDA948CC}.Release|Win32.ActiveCfg = Release|Win32
+		{AA3E61EA-D55E-4AA7-9EA0-A31EDDA948CC}.Release|Win32.Build.0 = Release|Win32
+		{31CA2F25-DB07-4F2D-A1C7-61B55555501F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{31CA2F25-DB07-4F2D-A1C7-61B55555501F}.Debug|Win32.Build.0 = Debug|Win32
+		{31CA2F25-DB07-4F2D-A1C7-61B55555501F}.Release|Win32.ActiveCfg = Release|Win32
+		{31CA2F25-DB07-4F2D-A1C7-61B55555501F}.Release|Win32.Build.0 = Release|Win32
+		{1ADA30F0-F2E3-4B3F-8063-6A23B55EFE9F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1ADA30F0-F2E3-4B3F-8063-6A23B55EFE9F}.Debug|Win32.Build.0 = Debug|Win32
+		{1ADA30F0-F2E3-4B3F-8063-6A23B55EFE9F}.Release|Win32.ActiveCfg = Release|Win32
+		{1ADA30F0-F2E3-4B3F-8063-6A23B55EFE9F}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
