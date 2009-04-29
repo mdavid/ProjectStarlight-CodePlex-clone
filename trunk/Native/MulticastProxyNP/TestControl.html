@@ -1,0 +1,32 @@
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" Content="Microsoft Visual Studio 8.0">
+<TITLE></TITLE>
+<script>
+var obj = {
+    AddPacketBase64 : function(b64str) {
+    document.getElementById("log").innerHTML = b64str;
+    }
+};
+function doOnload() {
+alert('onload');
+var proxyObj = document.getElementById('proxyObj');
+proxyObj.Test("Test Message");
+alert(proxyObj.FetchNSC("http://qa-vmware2-vm3/mikep_multicast_test.nsc"));
+proxyObj.StartStreaming("239.192.48.17", 17636, obj);
+}
+</script>
+</HEAD>
+<BODY onload="doOnload()">
+<div id="starlight_multicast_proxy_log">
+</div>
+<embed  id="proxyObj" type="application/x-vnd-starlight-proxy"></embed>
+<div id="log"></div>
+<script>
+
+
+</script>
+
+
+</BODY>
+</HTML>
