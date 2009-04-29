@@ -1,0 +1,10 @@
+C:\Documents and Settings\mpoindexter\My Documents\Visual Studio 2008\Projects\StarlightPlayer\PacketSourceAPI\Bin\Release\Starlight.PacketSourceAPI.dll
+C:\Documents and Settings\mpoindexter\My Documents\Visual Studio 2008\Projects\StarlightPlayer\PacketSourceAPI\Bin\Release\Starlight.PacketSourceAPI.pdb
+C:\Documents and Settings\mpoindexter\My Documents\Visual Studio 2008\Projects\StarlightPlayer\PacketSourceAPI\obj\Release\ResolveAssemblyReference.cache
+C:\Documents and Settings\mpoindexter\My Documents\Visual Studio 2008\Projects\StarlightPlayer\PacketSourceAPI\obj\Release\Starlight.PacketSourceAPI.dll
+C:\Documents and Settings\mpoindexter\My Documents\Visual Studio 2008\Projects\StarlightPlayer\PacketSourceAPI\obj\Release\Starlight.PacketSourceAPI.pdb
+C:\Documents and Settings\mpoindexter\My Documents\Visual Studio 2008\Projects\ProjectStarlight\PacketSourceAPI\Bin\Release\Starlight.PacketSourceAPI.dll
+C:\Documents and Settings\mpoindexter\My Documents\Visual Studio 2008\Projects\ProjectStarlight\PacketSourceAPI\Bin\Release\Starlight.PacketSourceAPI.pdb
+C:\Documents and Settings\mpoindexter\My Documents\Visual Studio 2008\Projects\ProjectStarlight\PacketSourceAPI\obj\Release\ResolveAssemblyReference.cache
+C:\Documents and Settings\mpoindexter\My Documents\Visual Studio 2008\Projects\ProjectStarlight\PacketSourceAPI\obj\Release\Starlight.PacketSourceAPI.dll
+C:\Documents and Settings\mpoindexter\My Documents\Visual Studio 2008\Projects\ProjectStarlight\PacketSourceAPI\obj\Release\Starlight.PacketSourceAPI.pdb

@@ -1,0 +1,10 @@
+C:\Documents and Settings\mpoindexter\My Documents\Visual Studio 2008\Projects\StarlightPlayer\NSCParser\Bin\Release\Starlight.NSCParser.dll
+C:\Documents and Settings\mpoindexter\My Documents\Visual Studio 2008\Projects\StarlightPlayer\NSCParser\Bin\Release\Starlight.NSCParser.pdb
+C:\Documents and Settings\mpoindexter\My Documents\Visual Studio 2008\Projects\StarlightPlayer\NSCParser\obj\Release\ResolveAssemblyReference.cache
+C:\Documents and Settings\mpoindexter\My Documents\Visual Studio 2008\Projects\StarlightPlayer\NSCParser\obj\Release\Starlight.NSCParser.dll
+C:\Documents and Settings\mpoindexter\My Documents\Visual Studio 2008\Projects\StarlightPlayer\NSCParser\obj\Release\Starlight.NSCParser.pdb
+C:\Documents and Settings\mpoindexter\My Documents\Visual Studio 2008\Projects\ProjectStarlight\NSCParser\Bin\Release\Starlight.NSCParser.dll
+C:\Documents and Settings\mpoindexter\My Documents\Visual Studio 2008\Projects\ProjectStarlight\NSCParser\Bin\Release\Starlight.NSCParser.pdb
+C:\Documents and Settings\mpoindexter\My Documents\Visual Studio 2008\Projects\ProjectStarlight\NSCParser\obj\Release\ResolveAssemblyReference.cache
+C:\Documents and Settings\mpoindexter\My Documents\Visual Studio 2008\Projects\ProjectStarlight\NSCParser\obj\Release\Starlight.NSCParser.dll
+C:\Documents and Settings\mpoindexter\My Documents\Visual Studio 2008\Projects\ProjectStarlight\NSCParser\obj\Release\Starlight.NSCParser.pdb
