@@ -17,6 +17,7 @@
     </style>
     
     <script type="text/javascript">
+        var slCtl;
         var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
         
         function onSilverlightError(sender, args) {
@@ -54,7 +55,7 @@
         }
 
         function pluginLoaded(sender, args) {      // HTML version 
-            var slCtl = sender.getHost();
+            slCtl = sender.getHost();
             var fileProxy;
 
             //For Google Chrome, we have to proxy all Silverlight<->Native communication
@@ -97,25 +98,71 @@
             slCtl.Content.Bridge.PlaylistLoaded = function() {
                 slCtl.Content.Bridge.StartStreaming(fileProxy);
             };
-            //slCtl.Content.Bridge.addEventListener("ScriptCommandFired", function(sender, eventArgs) {
-            //    try {
-            //        var playerTime = slCtl.Content.Bridge.CurrentPlayerTime;
-            //        var eventTime = eventArgs.Time;
-            //        var delta = eventTime - playerTime;
-            //        delta = delta / 10000;
-            //        if (delta > 0) {
-            //            setTimeout(function() {
-            //                document.getElementById('scriptEventLog').innerHTML += slCtl.Content.Bridge.CurrentPlayerTime + ":" + eventArgs.Time + ":" + eventArgs.Type + ":" + eventArgs.Data + "<br>";
-            //            }, delta);
-            //        } else {
-            //            document.getElementById('scriptEventLog').innerHTML += slCtl.Content.Bridge.CurrentPlayerTime + ":" + eventArgs.Time + ":" + eventArgs.Type + ":" + eventArgs.Data + "<br>";
-            //        }
-            //    } catch (e) {
-            //        alert(e);
-            //    }
-            //});
 
-            slCtl.Content.Bridge.LoadPlaylistAsync('asx:<ASX><ENTRY><REF href="http://qa-3/mikep_multicast_test.nsc"/></ENTRY><ENTRY><REF href="mms://10.1.199.126:8085/mikep_unicast_test"/></ENTRY></ASX>');
+            
+        }
+
+
+        function removeEntry(button) {
+            var ref = button;
+            while (ref) {
+                if (ref.className == "playlistRow") {
+                    break;
+                }
+                ref = ref.parentNode;
+            }
+
+            if (ref) {
+                ref.parentNode.remveChild(ref);
+            }
+        }
+
+        function addRow() {
+            var ref = document.getElementById("playlistEntries");
+            var child = ref.firstChild;
+            while (child) {
+                if (child.className == "playlistRow") {
+                    break;
+                }
+                child = child.nextSibling;
+            }
+
+            if (child) {
+                var n = child.cloneNode(true);
+                ref.appendChild(n);
+            }
+        }
+
+        function setPlaylist() {
+            var entries = [];
+            var ref = document.getElementById("playlistEntries");
+            var child = ref.firstChild;
+            while (child) {
+                if (child.className == "playlistRow") {
+                    var subChild = child.firstChild;
+                    while (subChild) {
+                        if (subChild.className == "urlField") {
+                            entries.push(subChild.value);
+                        }
+                        try {
+                            subChild.disabled = true;
+                        } catch (e) {
+                        }
+                        subChild = subChild.nextSibling;
+                    }
+                }
+                child = child.nextSibling;
+            }
+            document.getElementById("addRowBtn").disabled = true;
+            document.getElementById("playBtn").disabled = true;
+            var str = "asx:<ASX>";
+            for (var i = 0; i < entries.length; i++) {
+                str += "<ENTRY><REF href=\"" + entries[i] + "\"/></ENTRY>";
+            }
+            str += "</ASX>";
+
+            //'asx:<ASX><ENTRY><REF href="http://qa-3/mikep_multicast_test.nsc"/></ENTRY><ENTRY><REF href="mms://10.1.199.126:8085/mikep_unicast_test"/></ENTRY></ASX>'
+            slCtl.Content.Bridge.LoadPlaylistAsync(str);
         }
     </script>
 </head>
@@ -140,9 +187,22 @@
 	This will contain debugging information and should be removed or hidden when debugging is completed -->
 	<div id='errorLocation' style="font-size: small;color: Gray;"></div>
 
+    <div>
+        <div id="playlistEntries">
+            <div class="playlistRow">
+                URL: <input type="text" class="urlField" /> <input type="button" value="x" onclick="removeEntry(this); return false;" />
+            </div>
+            
+            
+        </div>
+        <div>
+            <input type="button" id="addRowBtn" onclick="addRow(); return false;" value="Add Entry" />
+            <input type="button" id="playBtn" onclick="setPlaylist(); return false;" value="Play" />
+        </div>
+    </div>
     <div id="silverlightControlHost">
 		<object data="data:application/x-silverlight," type="application/x-silverlight-2" width="100%" height="100%">
-			<param name="source" value="bin/debug/StarlightSamplePlayer.xap"/>
+			<param name="source" value="bin/release/StarlightSamplePlayer.xap"/>
 			<param name="onerror" value="onSilverlightError" />
 			<param name="onLoad" value="pluginLoaded" />
 			<param name="background" value="gray" />

@@ -12,18 +12,21 @@
                 <RowDefinition Height="20"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="133"/>
-                <ColumnDefinition Width="133"/>
-                <ColumnDefinition Width="133"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="100"/>
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Row="1" Grid.Column="0" Text="Status" FontWeight="Bold"></TextBlock>
             <TextBlock Grid.Row="1" Grid.Column="1" Text="Buffer Level" FontWeight="Bold"></TextBlock>
             <TextBlock Grid.Row="1" Grid.Column="2" Text="Position" FontWeight="Bold"></TextBlock>
+            <TextBlock Grid.Row="1" Grid.Column="3" Text="Stream Type" FontWeight="Bold"></TextBlock>
             <TextBlock Grid.Row="2" Grid.Column="0"  x:Name="StatusText" Text="{Binding CurrentState}"></TextBlock>
             <TextBlock Grid.Row="2" Grid.Column="1" x:Name="BufferLevelText" Text="{Binding BufferingProgress}"></TextBlock>
             <TextBlock Grid.Row="2" Grid.Column="2" x:Name="PositionText" Text="{Binding Position}"></TextBlock>
+            <TextBlock Grid.Row="2" Grid.Column="3" x:Name="StreamTypeText" Text="{Binding StreamType}"></TextBlock>
             
-            <MediaElement HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" AutoPlay="False" x:Name="MediaPlayer">
+            <MediaElement HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" AutoPlay="False" x:Name="MediaPlayer">
             </MediaElement>
         </Grid>
         <Canvas Name="OverlayRect" Background="Black" Opacity="0" Canvas.ZIndex="20">

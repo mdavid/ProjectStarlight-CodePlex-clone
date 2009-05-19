@@ -101,6 +101,38 @@ namespace Starlight.SamplePlayer
             get { return page.MediaPlayer.Position.Ticks / 10000; }
         }
 
+        public string StreamType
+        {
+            get
+            {
+                if (page.Bridge != null && page.Bridge.Playlist != null)
+                {
+                    PlaylistEntry ple = page.Bridge.Playlist.CurrentEntry;
+                    if (ple is NSCPlaylistEntry)
+                    {
+                        return "Multicast";
+                    }
+                    else if (ple is FailoverPlaylistEntry)
+                    {
+                        ple = ((FailoverPlaylistEntry)ple).CurrentEntry;
+                        if (ple is NSCPlaylistEntry)
+                        {
+                            return "Multicast";
+                        }
+                        else
+                        {
+                            return "Unicast";
+                        }
+                    }
+                    else
+                    {
+                        return "Unicast";
+                    }
+                }
+                return "Unknown";
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual void OnPropertyChanged(string propertyName)
@@ -119,6 +151,7 @@ namespace Starlight.SamplePlayer
             {
                 OnPropertyChanged("Position");
                 OnPropertyChanged("BufferingProgress");
+                OnPropertyChanged("StreamType");
             });
         }
     }

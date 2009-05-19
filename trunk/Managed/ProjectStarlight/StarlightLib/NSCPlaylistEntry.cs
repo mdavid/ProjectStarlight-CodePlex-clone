@@ -107,7 +107,7 @@ namespace Starlight.Lib
 
         private void OnPacket(Packet p)
         {
-            if (lastStreamHeader != p.PacketHeader)
+            if (lastStreamHeader != p.PacketHeader && p.PacketData != null)
             {
                 needToChangeStream = true;
                 lastStreamHeader = p.PacketHeader;
@@ -129,6 +129,8 @@ namespace Starlight.Lib
                             currentStream = nextStream;
                             DispatcherOperation op = dispatcher.BeginInvoke(delegate()
                             {
+                                try
+                                {
                                 player.SetSource(currentStream);
                                 if (oldCurrent != null)
                                 {
@@ -136,6 +138,12 @@ namespace Starlight.Lib
                                     {
                                         streams[oldCurrent.Header] = oldCurrent.CreateReplacementStream();
                                     }
+                                    }
+                                }
+                                catch (InvalidOperationException e)
+                                {
+                                    //Ignore it...was probably just the media player saying it didn't
+                                    //want us to do that right now.
                                 }
                             });
                         }
