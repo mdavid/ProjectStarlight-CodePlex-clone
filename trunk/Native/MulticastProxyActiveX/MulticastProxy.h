@@ -196,20 +196,28 @@ public:
 
 		}
 
-		CComBSTR packetData;
-		int idx = 0;
-		while(idx < totalPacketSz) 
+
+		int b64sz = ((totalPacketSz / 3) + (totalPacketSz % 3 > 0 ? 1 : 0)) * 4 + 1;
+		char* b64Data = new char[b64sz];
+		b64Data[b64sz - 1] = 0;
+		int srcIdx = 0;
+		int destIdx = 0;
+		while(srcIdx < totalPacketSz) 
 		{
-			int len = totalPacketSz - idx;
+			int len = totalPacketSz - srcIdx;
 			if(len > 3) {
 				len = 3;
 			}
-			b64chunk(allData + idx, outBuf, len);
-			packetData.Append(outBuf);
-			idx += len;
+			b64chunk(allData + srcIdx, b64Data + destIdx, len);
+			srcIdx += len;
+			destIdx += 4;
 		}
 
 		delete[] allData;
+
+		CComBSTR packetData(b64Data);
+
+		delete[] b64Data;
 
 		arg.bstrVal = packetData;
 		arg.vt = VT_BSTR;

@@ -56,7 +56,6 @@ public:
 	RingBuffer(void);
 	~RingBuffer(void);
 	void AddPacket(RingBufferPacket*);
-	RingBufferPacket* TakePacket();
 	int TakeMultiple(RingBufferPacket*[], unsigned int);
 	void Stop();
 	void Clear();

@@ -89,49 +89,6 @@ void RingBuffer::AddPacket(RingBufferPacket* packet)
 	
 }
 
-RingBufferPacket* RingBuffer::TakePacket()
-{
-	RingBufferPacket* ret;
-	
-	#ifdef PLAT_MAC
-	pthread_mutex_lock(&m_mutex);
-	while(!m_dataReady && !m_stop) 
-	{
-		pthread_cond_wait(&m_event, &m_mutex);
-	}
-	if(m_stop)
-	{
-		ret = NULL;
-	}
-	else if(m_dataReady)
-	{
-		ret = m_data[m_head];
-		m_head = (m_head + 1) % RING_BUFFER_SZ;
-		m_dataReady = false;
-	}
-
-	pthread_mutex_unlock(&m_mutex);
-	return ret;
-	#endif
-	
-	#ifdef PLAT_WIN
-	switch(WaitForMultipleObjects(2, m_handles, FALSE, INFINITE))
-	{
-	case STOP_HANDLE:
-		return NULL;
-	case READY_HANDLE:
-		EnterCriticalSection(&m_crit);
-		ret = m_data[m_head];
-		m_head = (m_head + 1) % RING_BUFFER_SZ;
-		LeaveCriticalSection(&m_crit);
-		return ret;
-	default:
-		return NULL;
-	}
-	#endif
-	
-}
-
 int RingBuffer::TakeMultiple(RingBufferPacket** data, unsigned int count)
 {
 	int ret = 0;
