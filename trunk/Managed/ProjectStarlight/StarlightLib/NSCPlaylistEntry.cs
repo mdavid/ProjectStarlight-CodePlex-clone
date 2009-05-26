@@ -73,6 +73,7 @@ namespace Starlight.Lib
         {
             MulticastController bridge = (MulticastController)bridgeContext[MulticastController.KEY_BRIDGE];
             PushSourceController pushControl = (PushSourceController)bridgeContext[MulticastController.KEY_PUSH_SOURCE_CONTROLLER];
+            IDebugLogger logger = (IDebugLogger)bridgeContext[MulticastController.KEY_LOGGER];
 
             //TODO:  Make the NSC fetching happen asynchronously.
             NSC.NSC nsc = new NSC.NSCParser().ParseNSC(pushControl.FetchNSC(nscUri));
@@ -85,7 +86,7 @@ namespace Starlight.Lib
                 foreach (PacketSource.Header header in packetSource.AllHeaders)
                 {
                     StreamSplitPacketSource subPacketSource = new StreamSplitPacketSource(packetSource, header);
-                    ASFMediaStreamSource mss = new ASFMediaStreamSource(header, subPacketSource);
+                    ASFMediaStreamSource mss = new ASFMediaStreamSource(header, subPacketSource, logger);
                     streams[header] = mss;
                 }
             }
@@ -94,7 +95,7 @@ namespace Starlight.Lib
             this.player = player;
             this.dispatcher = player.Dispatcher;
             packetSource.StartTimer();
-            pushControl.StartPush(nsc.Address, nsc.Port, packetSource);
+            pushControl.StartPush(nsc.Address, nsc.Port, nsc.MulticastAdapter, packetSource);
         }
 
         public override void Leaving(Dictionary<string, object> bridgeContext, MediaElement mediaElement)

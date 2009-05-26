@@ -41,7 +41,7 @@ namespace Starlight.Lib
     public interface PushSourceController
     {
         string FetchNSC(string nscUrl);
-        void StartPush(string host, int port, object pushTarget);
+        void StartPush(string host, int port, string source, object pushTarget);
         void StopPush();
     }
 }

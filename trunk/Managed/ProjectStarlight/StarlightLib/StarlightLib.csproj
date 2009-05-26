@@ -67,13 +67,14 @@
     <Compile Include="ScriptObjectPushSourceController.cs" />
     <Compile Include="StreamSplitPacketSource.cs" />
     <Compile Include="UnsupportedPlaylistFormatException.cs" />
+    <Compile Include="WebPageDebugLogger.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\StarlightPlayer\NSCParser\NSCParser.csproj">
+    <ProjectReference Include="..\NSCParser\NSCParser.csproj">
       <Project>{E5D38B73-BAF2-4C9B-9930-F7D8CF3A4EE9}</Project>
       <Name>NSCParser</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\StarlightPlayer\PacketSourceAPI\PacketSourceAPI.csproj">
+    <ProjectReference Include="..\PacketSourceAPI\PacketSourceAPI.csproj">
       <Project>{3C820639-1503-4ECD-BAA6-D44C8EC16D92}</Project>
       <Name>PacketSourceAPI</Name>
     </ProjectReference>

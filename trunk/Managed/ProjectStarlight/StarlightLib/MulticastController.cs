@@ -54,6 +54,7 @@ namespace Starlight.Lib
     {
         public static readonly string KEY_PUSH_SOURCE_CONTROLLER = "KEY_PUSH_SOURCE_CONTROLLER";
         public static readonly string KEY_BRIDGE = "KEY_BRIDGE";
+        public static readonly string KEY_LOGGER = "KEY_LOGGER";
 
         private Dictionary<string, object> bridgeContext = new Dictionary<string, object>();
         private Playlist playlist;
@@ -150,6 +151,16 @@ namespace Starlight.Lib
         {
             bridgeContext.Add(KEY_PUSH_SOURCE_CONTROLLER, new ScriptObjectPushSourceController(proxy));
             bridgeContext.Add(KEY_BRIDGE, this);
+            HtmlDocument doc = System.Windows.Browser.HtmlPage.Document;
+            HtmlElement logElement = doc.GetElementById("starlightDebugLog");
+            if (logElement != null)
+            {
+                bridgeContext.Add(KEY_LOGGER, new WebPageDebugLogger(logElement));
+            }
+            else
+            {
+                bridgeContext.Add(KEY_LOGGER, new DefaultDebugLogger());
+            }
         }
 
         private void OnDownloadPlaylistCompleted(object sender, DownloadStringCompletedEventArgs e)
