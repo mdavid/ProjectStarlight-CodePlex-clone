@@ -153,6 +153,7 @@ int32_t MulticastReceiverImpl::StartReceiving(const char* multicastGroup, const 
 	m_logger->LogTrace("Socket bound");
 	
 	//join the multicast group
+	#ifdef PLAT_WIN
 	if(strlen(m_multicastSource) > 0) 
 	{
 		m_logger->LogTrace("Joining source specific group");
@@ -166,13 +167,17 @@ int32_t MulticastReceiverImpl::StartReceiving(const char* multicastGroup, const 
 	}
 	else
 	{
+	#endif
+	
 		m_logger->LogTrace("Joining group");
 		ip_mreq multicastOptions;
 		memset(&multicastOptions, 0, sizeof(multicastOptions));
 		multicastOptions.imr_interface.s_addr = INADDR_ANY;
 		multicastOptions.imr_multiaddr.s_addr = inet_addr(m_multicastGroup);
 		rc = setsockopt(m_socket, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&multicastOptions, sizeof(multicastOptions));  
+	#ifdef PLAT_WIN
 	}
+	#endif
 	if(rc < 0)
 	{
 		rc = LAST_SOCK_ERROR;
