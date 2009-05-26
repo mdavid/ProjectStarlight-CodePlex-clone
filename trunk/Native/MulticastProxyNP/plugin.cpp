@@ -79,7 +79,7 @@ StarlightScriptable::Invoke(NPIdentifier name, const NPVariant* args,
 {
 	if (name == START_STREAMING_METHOD) 
 	{
-		if(argCount != 3)
+		if(argCount != 4)
 		{
 			return false;
 		}
