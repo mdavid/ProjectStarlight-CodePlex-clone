@@ -44,7 +44,7 @@
 ]
 __interface IMulticastProxy : IDispatch
 {
-	[id(1), helpstring("method StartStreaming")] HRESULT StartStreaming([in] BSTR multicastGroup, [in] USHORT multicastPort, [in] IDispatch* target);
+	[id(1), helpstring("method StartStreaming")] HRESULT StartStreaming([in] BSTR multicastGroup, [in] USHORT multicastPort, [in] BSTR multicastSource, [in] IDispatch* target);
 	[id(2), helpstring("method StopStreaming")] HRESULT StopStreaming(void);
 	[id(3), helpstring("method Test")] HRESULT Test([in] BSTR message);
 	[id(4), helpstring("method FetchNSC")] HRESULT FetchNSC([in] BSTR nscFileUrl, [out,retval] BSTR* nscContent);
@@ -284,7 +284,7 @@ public:
 
 public:
 
-	STDMETHOD(StartStreaming)(BSTR multicastGroup, USHORT multicastPort, IDispatch* target);
+	STDMETHOD(StartStreaming)(BSTR multicastGroup, USHORT multicastPort, BSTR multicastSource, IDispatch* target);
 	STDMETHOD(StopStreaming)(void);
 	STDMETHOD(Test)(BSTR message);
 	STDMETHOD(SetSite)(IUnknown*);

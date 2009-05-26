@@ -6,7 +6,7 @@
 
 
  /* File created by MIDL compiler version 6.00.0366 */
-/* at Mon Apr 13 10:59:26 2009
+/* at Tue May 26 10:36:39 2009
  */
 /* Compiler settings for _MulticastProxyActiveX.idl:
     Oicf, W1, Zp8, env=Win32 (32b run)

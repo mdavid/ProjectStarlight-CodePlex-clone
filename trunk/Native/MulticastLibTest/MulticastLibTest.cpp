@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
 	LoggerImpl logger;
 	MulticastCallbackImpl callback;
 	MulticastReceiver* receiver = CreateMulticastReceiver((Logger*)&logger);
-	receiver->StartReceiving(argv[1], port, (MulticastCallback*)&callback);
+	receiver->StartReceiving(argv[1], "", port, (MulticastCallback*)&callback);
 	printf("receiving started, press any key to exit");
 	getchar();
 	receiver->StopReceiving();

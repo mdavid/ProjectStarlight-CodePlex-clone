@@ -93,8 +93,9 @@ StarlightScriptable::Invoke(NPIdentifier name, const NPVariant* args,
 		{
 			port = (int)NPVARIANT_TO_DOUBLE(args[1]);
 		}
-		NPObject* target = NPVARIANT_TO_OBJECT(args[2]);
-		return StartStreaming(multicastGroup, port, target, result);
+		NPString multicastSource = NPVARIANT_TO_STRING(args[2]);
+		NPObject* target = NPVARIANT_TO_OBJECT(args[3]);
+		return StartStreaming(multicastGroup, port, multicastSource, target, result);
 	}
 	else if(name == STOP_STREAMING_METHOD)
 	{
@@ -125,7 +126,7 @@ StarlightScriptable::Invoke(NPIdentifier name, const NPVariant* args,
 }
 
 bool 
-StarlightScriptable::StartStreaming(NPString multicastGroup, int32_t port, NPObject* target, NPVariant* result)
+StarlightScriptable::StartStreaming(NPString multicastGroup, int32_t port, NPString multicastSource, NPObject* target, NPVariant* result)
 {
 	m_callback->Init(target);
 
@@ -133,9 +134,14 @@ StarlightScriptable::StartStreaming(NPString multicastGroup, int32_t port, NPObj
 	memset(multicastGroupBuffer, 0, NPSTR_LEN(multicastGroup) + 1);
 	memcpy(multicastGroupBuffer, NPSTR_CHARS(multicastGroup), NPSTR_LEN(multicastGroup));
 
-	int32_t rc = m_receiver->StartReceiving(multicastGroupBuffer, port, m_callback);
+	char* multicastSourceBuffer = new char[NPSTR_LEN(multicastSource) + 1];
+	memset(multicastSourceBuffer, 0, NPSTR_LEN(multicastSource) + 1);
+	memcpy(multicastSourceBuffer, NPSTR_CHARS(multicastSource), NPSTR_LEN(multicastSource));
+
+	int32_t rc = m_receiver->StartReceiving(multicastGroupBuffer, multicastSourceBuffer, port, m_callback);
 
 	delete[] multicastGroupBuffer;
+	delete[] multicastSourceBuffer;
 	VOID_TO_NPVARIANT(*result);
 	if(rc != 0)
 	{

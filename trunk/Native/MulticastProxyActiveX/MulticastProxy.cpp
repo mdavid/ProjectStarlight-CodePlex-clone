@@ -32,13 +32,14 @@
 // CMulticastProxy
 
 
-STDMETHODIMP CMulticastProxy::StartStreaming(BSTR multicastGroup, USHORT multicastPort, IDispatch* target)
+STDMETHODIMP CMulticastProxy::StartStreaming(BSTR multicastGroup, USHORT multicastPort, BSTR multicastSource, IDispatch* target)
 {
 	USES_CONVERSION;
 
 	char* cstrMulticastGroup = W2A(multicastGroup);
+	char* cstrMulticastSource = W2A(multicastSource);
 	m_callback->Init(target);
-	DWORD rc = m_receiver->StartReceiving(cstrMulticastGroup, multicastPort, m_callback);
+	DWORD rc = m_receiver->StartReceiving(cstrMulticastGroup, cstrMulticastSource, multicastPort, m_callback);
 	if(rc != 0)
 	{
 		return HRESULT_FROM_WIN32(rc);

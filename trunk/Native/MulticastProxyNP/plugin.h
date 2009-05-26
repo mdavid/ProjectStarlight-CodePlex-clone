@@ -207,7 +207,7 @@ public:
   virtual bool HasMethod(NPIdentifier name);
   virtual bool Invoke(NPIdentifier name, const NPVariant *args,
                       uint32_t argCount, NPVariant *result);
-  bool StartStreaming(NPString multicastGroup, int32_t port, NPObject* target, NPVariant *result);
+  bool StartStreaming(NPString multicastGroup, int32_t port, NPString multicastSource, NPObject* target, NPVariant *result);
   bool StopStreaming(NPVariant *result);
   bool Test(NPString message, NPVariant *result);
   bool FetchNSC(NPString url, NPVariant *result);

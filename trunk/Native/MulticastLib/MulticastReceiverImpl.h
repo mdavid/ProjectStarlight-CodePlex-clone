@@ -45,12 +45,13 @@ public:
 	MulticastReceiverImpl(Logger*);
 	virtual ~MulticastReceiverImpl(void);
 
-	virtual int32_t StartReceiving(const char*, int, MulticastCallback*);
+	virtual int32_t StartReceiving(const char*, const char*, int, MulticastCallback*);
 	virtual int32_t StopReceiving();
 
 private:
 	bool m_isReceiving;
 	char* m_multicastGroup;
+	char* m_multicastSource;
 	MulticastCallback* m_callback;
 	socket_t m_socket;
 	thread_handle_t m_threadHandles[2];

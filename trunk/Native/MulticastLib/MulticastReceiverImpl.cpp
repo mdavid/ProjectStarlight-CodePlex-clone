@@ -41,7 +41,7 @@ MulticastReceiverImpl::~MulticastReceiverImpl(void)
 	}
 }
 
-int32_t MulticastReceiverImpl::StartReceiving(const char* multicastGroup, int port, MulticastCallback* callback)
+int32_t MulticastReceiverImpl::StartReceiving(const char* multicastGroup, const char* multicastSource, int port, MulticastCallback* callback)
 {
 	if(m_isReceiving)
 	{
@@ -60,12 +60,12 @@ int32_t MulticastReceiverImpl::StartReceiving(const char* multicastGroup, int po
 	int32_t recvBufSz;
 	int32_t reuse;
 	struct timeval recvTimeout;
-	struct ip_mreq multicastOptions; 
 	int rc;
 	sockaddr_in_t addrLocal;
 
 	m_callback = callback;
 	m_multicastGroup = strdup(multicastGroup);
+	m_multicastSource = strdup(multicastSource);
 
 	//Create the socket
 	m_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -153,10 +153,26 @@ int32_t MulticastReceiverImpl::StartReceiving(const char* multicastGroup, int po
 	m_logger->LogTrace("Socket bound");
 	
 	//join the multicast group
-	memset(&multicastOptions, 0, sizeof(multicastOptions));
-	multicastOptions.imr_interface.s_addr = INADDR_ANY;
-	multicastOptions.imr_multiaddr.s_addr = inet_addr(m_multicastGroup);
-	rc = setsockopt(m_socket, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&multicastOptions, sizeof(multicastOptions));  
+	if(strlen(m_multicastSource) > 0) 
+	{
+		m_logger->LogTrace("Joining source specific group");
+		ip_mreq_source multicastOptions;
+		memset(&multicastOptions, 0, sizeof(multicastOptions));
+		multicastOptions.imr_interface.s_addr = INADDR_ANY;
+		multicastOptions.imr_multiaddr.s_addr = inet_addr(m_multicastGroup);
+		multicastOptions.imr_sourceaddr.s_addr = inet_addr(m_multicastSource);
+		rc = setsockopt(m_socket, IPPROTO_IP, IP_ADD_SOURCE_MEMBERSHIP, (char*)&multicastOptions, sizeof(multicastOptions));  
+		
+	}
+	else
+	{
+		m_logger->LogTrace("Joining group");
+		ip_mreq multicastOptions;
+		memset(&multicastOptions, 0, sizeof(multicastOptions));
+		multicastOptions.imr_interface.s_addr = INADDR_ANY;
+		multicastOptions.imr_multiaddr.s_addr = inet_addr(m_multicastGroup);
+		rc = setsockopt(m_socket, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&multicastOptions, sizeof(multicastOptions));  
+	}
 	if(rc < 0)
 	{
 		rc = LAST_SOCK_ERROR;
@@ -220,6 +236,7 @@ int32_t MulticastReceiverImpl::StartReceiving(const char* multicastGroup, int po
 errorEnd:
 	m_isReceiving = false;
 	free(m_multicastGroup);
+	free(m_multicastSource);
 	if(m_socket > -1)
 	{
 		SOCK_CLOSE(m_socket);
@@ -288,6 +305,7 @@ int32_t MulticastReceiverImpl::StopReceiving()
 
 	SOCK_CLOSE(m_socket);
 	free(m_multicastGroup);
+	free(m_multicastSource);
 	m_logger->LogTrace("Done with stop");
 	return rc;
 }

@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 6.00.0366 */
-/* at Mon Apr 13 10:59:26 2009
+/* at Tue May 26 10:36:39 2009
  */
 /* Compiler settings for _MulticastProxyActiveX.idl:
     Oicf, W1, Zp8, env=Win32 (32b run)
@@ -95,6 +95,7 @@ EXTERN_C const IID IID_IMulticastProxy;
         virtual /* [helpstring][id] */ HRESULT STDMETHODCALLTYPE StartStreaming( 
             /* [in] */ BSTR multicastGroup,
             /* [in] */ USHORT multicastPort,
+            /* [in] */ BSTR multicastSource,
             /* [in] */ IDispatch *target) = 0;
         
         virtual /* [helpstring][id] */ HRESULT STDMETHODCALLTYPE StopStreaming( void) = 0;
@@ -158,6 +159,7 @@ EXTERN_C const IID IID_IMulticastProxy;
             IMulticastProxy * This,
             /* [in] */ BSTR multicastGroup,
             /* [in] */ USHORT multicastPort,
+            /* [in] */ BSTR multicastSource,
             /* [in] */ IDispatch *target);
         
         /* [helpstring][id] */ HRESULT ( STDMETHODCALLTYPE *StopStreaming )( 
@@ -208,8 +210,8 @@ EXTERN_C const IID IID_IMulticastProxy;
     (This)->lpVtbl -> Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr)
 
 
-#define IMulticastProxy_StartStreaming(This,multicastGroup,multicastPort,target)	\
-    (This)->lpVtbl -> StartStreaming(This,multicastGroup,multicastPort,target)
+#define IMulticastProxy_StartStreaming(This,multicastGroup,multicastPort,multicastSource,target)	\
+    (This)->lpVtbl -> StartStreaming(This,multicastGroup,multicastPort,multicastSource,target)
 
 #define IMulticastProxy_StopStreaming(This)	\
     (This)->lpVtbl -> StopStreaming(This)
@@ -231,6 +233,7 @@ EXTERN_C const IID IID_IMulticastProxy;
     IMulticastProxy * This,
     /* [in] */ BSTR multicastGroup,
     /* [in] */ USHORT multicastPort,
+    /* [in] */ BSTR multicastSource,
     /* [in] */ IDispatch *target);
 
 

@@ -13,10 +13,10 @@ import "C:\Program Files\Microsoft Visual Studio 8\VC\PlatformSDK\include\objsaf
 	helpstring("IMulticastProxy Interface"),
 	pointer_default(unique)
 ] 
-#line 20 "c:\\documents and settings\\mpoindexter\\my documents\\visual studio 2005\\projects\\multicastnative\\multicastproxyactivex\\multicastproxy.h"
+#line 45 "c:\\home\\mpoindexter\\starlightnative\\multicastproxyactivex\\multicastproxy.h"
 interface IMulticastProxy : IDispatch {
-#line 22 "c:\\documents and settings\\mpoindexter\\my documents\\visual studio 2005\\projects\\multicastnative\\multicastproxyactivex\\multicastproxy.h"
-	[id(1),helpstring("method StartStreaming")] HRESULT  StartStreaming([in] BSTR multicastGroup, [in] USHORT multicastPort, [in] IDispatch *target);
+#line 47 "c:\\home\\mpoindexter\\starlightnative\\multicastproxyactivex\\multicastproxy.h"
+	[id(1),helpstring("method StartStreaming")] HRESULT  StartStreaming([in] BSTR multicastGroup, [in] USHORT multicastPort, [in] BSTR multicastSource, [in] IDispatch *target);
 	[id(2),helpstring("method StopStreaming")] HRESULT  StopStreaming();
 	[id(3),helpstring("method Test")] HRESULT  Test([in] BSTR message);
 	[id(4),helpstring("method FetchNSC")] HRESULT  FetchNSC([in] BSTR nscFileUrl, [out,retval] BSTR *nscContent);
@@ -32,9 +32,9 @@ library MulticastProxyActiveX
 	[
 		version(1.0),
 		uuid(5CCEF05B-17B2-48F0-A577-CC019FE455D7),
-		helpstring("MulticastProxy Class")
+		helpstring("Starlight Multicast Proxy Class")
 	] 
-#line 223 "c:\\documents and settings\\mpoindexter\\my documents\\visual studio 2005\\projects\\multicastnative\\multicastproxyactivex\\multicastproxy.h"
+#line 256 "c:\\home\\mpoindexter\\starlightnative\\multicastproxyactivex\\multicastproxy.h"
 	coclass CMulticastProxy {
 		[default]	interface IMulticastProxy;
 	};

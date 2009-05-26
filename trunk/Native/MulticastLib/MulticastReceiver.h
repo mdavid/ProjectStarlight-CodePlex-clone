@@ -38,7 +38,7 @@ class MulticastReceiver
 	
 public:
     virtual ~MulticastReceiver() {};
-	virtual int32_t StartReceiving(const char*, int, MulticastCallback*) = 0;
+	virtual int32_t StartReceiving(const char*, const char*, int, MulticastCallback*) = 0;
 	virtual int32_t StopReceiving() = 0;
 };
 
