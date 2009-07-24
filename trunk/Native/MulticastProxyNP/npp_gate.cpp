@@ -130,6 +130,7 @@ NPError	NPP_GetValue(NPP instance, NPPVariable variable, void *value)
     break;
   case NPPVpluginScriptableNPObject:
     *(NPObject **)value = plugin->GetScriptableObject();
+	NPN_RetainObject(*(NPObject **)value);
     break;
   default:
     rv = NPERR_GENERIC_ERROR;
@@ -217,8 +218,9 @@ NPObject *NPP_GetScriptableInstance(NPP instance)
 
   NPObject *npobj = 0;
   StarlightPlugin* pPlugin = (StarlightPlugin*)instance->pdata;
-  if (!pPlugin)
+  if (!pPlugin) {
     npobj = pPlugin->GetScriptableObject();
+  }
 
   return npobj;
 }
