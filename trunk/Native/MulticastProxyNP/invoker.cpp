@@ -34,21 +34,27 @@
  * Firefox only is supported, so we rely on NPN_PluginThreadAsyncCall to do our dirty work.
  */
 
-struct InvocationData 
+Invoker::Invoker() : 
+	m_stopped(0) 
 {
-	void (*f)(void*);
-	void* a;
-	HANDLE s;
-};
+	m_mainThreadId = GetCurrentThreadId();
+}
 
-Invoker::Invoker() : m_stopped(0) {}
-
-Invoker::~Invoker() {}
+Invoker::~Invoker() 
+{
+}
 
 void Invoker::Invoke(NPP plugin, void (*func)(void*), void* args)
 {
-	if(m_stopped)
+	
+	if(InterlockedCompareExchange(&m_stopped, 1, 1))
 	{
+		return;
+	}
+	int thisThreadId = GetCurrentThreadId();
+	if(thisThreadId == m_mainThreadId)
+	{
+		func(args);
 		return;
 	}
 	NPN_PluginThreadAsyncCall(plugin, func, args);
@@ -56,7 +62,7 @@ void Invoker::Invoke(NPP plugin, void (*func)(void*), void* args)
 
 void Invoker::Stop()
 {
-	this->m_stopped = 1;
+	InterlockedCompareExchange(&m_stopped, 1, 0);
 }
 
 #endif

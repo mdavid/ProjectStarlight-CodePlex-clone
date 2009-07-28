@@ -39,8 +39,13 @@ public:
 	void Stop();
 	
 private:
-	int32_t m_stopped;
+	
+#ifdef XP_WIN
+	volatile LONG m_stopped;
+	DWORD m_mainThreadId;
+#endif
 #ifdef XP_MACOSX
+	int32_t m_stopped;
 	CFMachPortRef m_machPort;
 	CFRunLoopSourceRef m_runLoop;
 	CFRunLoopRef m_mainLoop;
