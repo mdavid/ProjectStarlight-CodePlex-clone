@@ -187,6 +187,18 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\domlogger.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\invoker.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\multicastcallback.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\np_entry.cpp"
 				>
 			</File>
@@ -206,12 +218,36 @@
 				RelativePath=".\scriptableobject.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\scriptobjectutil.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\starlightscriptable.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\common.h"
+				>
+			</File>
+			<File
+				RelativePath=".\domlogger.h"
+				>
+			</File>
+			<File
+				RelativePath=".\invoker.h"
+				>
+			</File>
+			<File
+				RelativePath=".\multicastcallback.h"
+				>
+			</File>
 			<File
 				RelativePath=".\plugin.h"
 				>
@@ -222,6 +258,14 @@
 			</File>
 			<File
 				RelativePath=".\scriptableobject.h"
+				>
+			</File>
+			<File
+				RelativePath=".\scriptobjectutil.h"
+				>
+			</File>
+			<File
+				RelativePath=".\starlightscriptable.h"
 				>
 			</File>
 		</Filter>
