@@ -28,198 +28,35 @@
 #ifndef INC_PLUGIN_H
 #define INC_PLUGIN_H
 
-#ifdef XP_WIN
-#include <Windows.h>
-#include <Wininet.h>
-#include <stdio.h>
-#include "npapi.h"
-#include "npruntime.h"
-#define NPSTR_CHARS(S) (S.utf8characters)
-#define NPSTR_LEN(S) (S.utf8length)
-#define snprintf _snprintf_s
-#define strdup _strdup 
-#endif
+#include "common.h"
 
-#ifdef XP_MACOSX
-#include <CoreServices/CoreServices.h>
-#include <mach/port.h>
-#include <mach/message.h>
-#include <Webkit/npapi.h>
-#include <Webkit/npruntime.h>
-#define NPSTR_CHARS(S) (S.UTF8Characters)
-#define NPSTR_LEN(S) (S.UTF8Length)
-#endif
+#include "invoker.h"
+#include "domlogger.h"
+#include "multicastcallback.h"
 
-#include "scriptableobject.h"
 #include "../MulticastLib/MulticastReceiver.h"
-#include "../MulticastLib/MulticastCallback.h"
-#include "../MulticastLib/Logger.h"
-
-#define LOG_DOM_ELEMENT "starlight_multicast_proxy_log"
-#define JS_BUF_SZ 4096
-#define NSC_BUF_SZ 32768
-#define ERR_BUF_SZ 1024
-
-class AsyncCaller 
-{
-public:
-	AsyncCaller();
-	~AsyncCaller();
-	void CallAsync(NPP plugin, void (*func)(void*), void* args);
-private:
-	#ifdef XP_MACOSX
-	CFMachPortRef m_machPort;
-	CFRunLoopSourceRef m_runLoop;
-	CFRunLoopRef m_mainLoop;
-	#endif
-};
 
 class StarlightPlugin
 {
+public:
+	StarlightPlugin(NPP pNPInstance);
+	~StarlightPlugin();
+
+	NPObject* GetScriptableObject();
+	bool StartStreaming(NPString multicastGroup, int32_t port, NPString multicastSource, NPObject* target, NPVariant *result);
+	bool StopStreaming(NPVariant *result);
+	bool Test(NPString message, NPVariant *result);
+	bool FetchNSC(NPString url, NPVariant *result);
+	
 private:
-  NPP m_navigator;
-  NPObject* m_scriptableObject;
-
-public:
-  StarlightPlugin(NPP pNPInstance);
-  ~StarlightPlugin();
-
-  NPObject* GetScriptableObject();
+	NPP							m_navigator;
+	NPObject*					m_scriptableObject;
+	Invoker*					m_invoker;
+	MulticastReceiver*			m_receiver;
+	Logger*						m_logger;
+	NPNInvokeMulticastCallback*	m_callback;
+	
 };
 
-class DOMElementLoggerCallbackArgs
-{
-public:
-	DOMElementLoggerCallbackArgs(const char* message, const char* type, NPP navigator) : m_navigator(navigator)
-	{
-		m_message = strdup(message);
-		m_type = strdup(type);
-	}
-
-	~DOMElementLoggerCallbackArgs()
-	{
-		free(m_message);
-		free(m_type);
-	}
-
-	NPP m_navigator;
-	char* m_message;
-	char* m_type;
-};
-
-
-
-//A class which implements the Logger interface by
-//writing to a DOM Element named LOG_DOM_ELEMENT.
-class DOMElementLogger : public Logger
-{
-public:
-	DOMElementLogger(NPP navigator, AsyncCaller* async) : m_navigator(navigator), m_async(async)
-	{
-	}
-	virtual ~DOMElementLogger()
-	{
-	}
-
-	void LogTrace(const char*);
-	void LogError(const char*);
-	static void DoRealLog(void*);
-private:
-	NPP m_navigator;
-	AsyncCaller* m_async;
-};
-
-class NPNInvokeMulticastCallbackArgs
-{
-public:
-	NPNInvokeMulticastCallbackArgs(char* data, int szData, NPObject* target, NPIdentifier* method, Logger* logger, NPP navigator) : m_navigator(navigator), m_target(target), m_logger(logger), m_szData(szData), m_method(method), m_data(data)
-	{
-	}
-
-	~NPNInvokeMulticastCallbackArgs()
-	{
-		delete[] m_data;
-	}
-
-	NPP m_navigator;
-	Logger* m_logger;
-	NPObject* m_target;
-	int m_szData;
-	char* m_data;
-	NPIdentifier* m_method;
-};
-
-
-//A class that dispatches data via calls to an NPObject
-//hosted in the browser.
-class NPNInvokeMulticastCallback : public MulticastCallback
-{
-public:
-	NPNInvokeMulticastCallback(NPP navigator, Logger* logger, AsyncCaller* async) : m_logger(logger), m_navigator(navigator), m_async(async)
-	{
-		m_target = NULL;
-		ADD_PACKET_METHOD = NPN_GetStringIdentifier("AddPacketBase64");
-	}
-
-	virtual ~NPNInvokeMulticastCallback()
-	{
-		Release();
-	}
-
-	virtual void ReportPacketRead(int, MulticastCallbackData*);
-	void Init(NPObject*);
-	void Release();
-	static void DoRealReportPacketRead(void*);
-private:
-	NPIdentifier ADD_PACKET_METHOD;
-	NPP m_navigator;
-	NPObject* m_target;
-	Logger* m_logger;
-	AsyncCaller* m_async;
-};
-
-
-class StarlightScriptable : public ScriptablePluginObjectBase
-{
-public:
-  StarlightScriptable(NPP npp)
-    : ScriptablePluginObjectBase(npp)
-  {
-      m_async = new AsyncCaller();
-	  m_logger = new DOMElementLogger(npp, m_async);
-	  m_callback = new NPNInvokeMulticastCallback(npp, m_logger, m_async);
-	  m_receiver = CreateMulticastReceiver(m_logger);
-
-	  START_STREAMING_METHOD = NPN_GetStringIdentifier("StartStreaming");
-	  STOP_STREAMING_METHOD = NPN_GetStringIdentifier("StopStreaming");
-	  FETCH_NSC_METHOD = NPN_GetStringIdentifier("FetchNSC");
-	  TEST_METHOD = NPN_GetStringIdentifier("Test");
-  }
-
-  virtual ~StarlightScriptable()
-  {
-	  delete m_receiver;
-	  delete m_callback;
-	  delete m_logger;
-	  delete m_async;
-  }
-
-  virtual bool HasMethod(NPIdentifier name);
-  virtual bool Invoke(NPIdentifier name, const NPVariant *args,
-                      uint32_t argCount, NPVariant *result);
-  bool StartStreaming(NPString multicastGroup, int32_t port, NPString multicastSource, NPObject* target, NPVariant *result);
-  bool StopStreaming(NPVariant *result);
-  bool Test(NPString message, NPVariant *result);
-  bool FetchNSC(NPString url, NPVariant *result);
-private:
-  AsyncCaller* m_async;
-  MulticastReceiver* m_receiver;
-  Logger* m_logger;
-  NPNInvokeMulticastCallback* m_callback;
-  NPIdentifier START_STREAMING_METHOD;
-  NPIdentifier STOP_STREAMING_METHOD;
-  NPIdentifier FETCH_NSC_METHOD;
-  NPIdentifier TEST_METHOD;
-};
 
 #endif // INC_PLUGIN_H

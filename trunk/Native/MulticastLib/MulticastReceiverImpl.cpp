@@ -59,7 +59,7 @@ int32_t MulticastReceiverImpl::StartReceiving(const char* multicastGroup, const 
 
 	int32_t recvBufSz;
 	int32_t reuse;
-	struct timeval recvTimeout;
+	struct timeval recvTimeout = {0};
 	int rc;
 	sockaddr_in_t addrLocal;
 

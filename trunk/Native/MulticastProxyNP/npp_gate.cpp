@@ -220,6 +220,7 @@ NPObject *NPP_GetScriptableInstance(NPP instance)
   StarlightPlugin* pPlugin = (StarlightPlugin*)instance->pdata;
   if (!pPlugin) {
     npobj = pPlugin->GetScriptableObject();
+	NPN_RetainObject(npobj);
   }
 
   return npobj;
