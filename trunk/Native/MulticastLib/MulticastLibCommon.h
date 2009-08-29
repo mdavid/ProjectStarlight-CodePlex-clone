@@ -55,6 +55,8 @@
 	#define EWOULDBLOCK WSAEWOULDBLOCK
 	#define snprintf _snprintf_s
 	#define strdup _strdup 
+
+	#define SLEEP_MILLI(millis) Sleep(millis) 
 #endif /* PLAT_WIN */
 
 #ifdef PLAT_MAC
@@ -78,6 +80,8 @@
 	#define THREAD_DECL void*
 	#define LAST_SOCK_ERROR errno
 	#define SOCK_CLOSE(S) close(S)
+
+	#define SLEEP_MILLI(millis) usleep(millis * 1000) 
 #endif /* PLAT_MAC */
 
 #endif /* INC_MCASTLIBCOMMON_H */

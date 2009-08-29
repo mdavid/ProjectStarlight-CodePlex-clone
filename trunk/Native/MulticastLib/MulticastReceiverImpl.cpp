@@ -367,6 +367,8 @@ THREAD_DECL MulticastEventNotificationThread(void* iValue)
 			{
 				delete packets[i];
 			}
+		} else {
+			SLEEP_MILLI(1);
 		}
 	}
 	return 0;

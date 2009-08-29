@@ -38,6 +38,30 @@
 #define STOP_HANDLE 0
 #define READY_HANDLE 1
 
+#ifdef PLAT_WIN
+#define ATOMIC_CAS(target, newval, oldval) (InterlockedCompareExchange((volatile LONG*)&target, newval, oldval) == oldval)
+#define ATOMIC_CLR(target) InterlockedExchange((volatile LONG*)&target, 0)
+#define ATOMIC_ALIGN __declspec(align(32)) volatile
+typedef unsigned short uint16_t; 
+typedef unsigned long uint32_t;
+#endif
+
+#ifdef PLAT_MAC
+#define ATOMIC_CAS(target, newval, oldval) OSAtomicCompareAndSwap32(oldval, newval, &target)
+#define ATOMIC_CLR(target) (target = 0)
+#define ATOMIC_ALIGN __attribute__ ((aligned (32))
+#endif
+
+struct head_and_tail {
+	uint16_t head;
+	uint16_t tail;
+};
+
+union rb_ptrs {
+	head_and_tail ht;
+	uint32_t val;
+};
+
 class RingBufferPacket
 {
 public:
@@ -62,20 +86,8 @@ public:
 
 private:
 	RingBufferPacket* m_data[RING_BUFFER_SZ];
-	unsigned int m_head;
-	unsigned int m_tail;
-	
-	#ifdef PLAT_WIN
-	CRITICAL_SECTION m_crit;
-	HANDLE m_handles[2];
-	#endif
-	
-	#ifdef PLAT_MAC
-	pthread_mutex_t m_mutex;
-	pthread_cond_t m_event;
-	bool m_stop;
-	bool m_dataReady;																								   
-	#endif
+	ATOMIC_ALIGN rb_ptrs m_pointers;
+	bool m_stopped;
 };
 
 #endif /* INC_RINGBUFFER_H */

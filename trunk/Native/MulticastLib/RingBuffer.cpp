@@ -27,160 +27,86 @@
 
 #include "RingBuffer.h"
 
-RingBuffer::RingBuffer(void) : m_head(0), m_tail(0)
-{
-	#ifdef PLAT_MAC
-	pthread_mutex_init(&m_mutex, NULL);
-	pthread_cond_init(&m_event, NULL);
-	m_stop = false;
-	m_dataReady = false;
-	#endif
-	
-	#ifdef PLAT_WIN
-	InitializeCriticalSection(&m_crit);
-	m_handles[READY_HANDLE] = CreateEvent(NULL, 0, FALSE, NULL);
-	m_handles[STOP_HANDLE] = CreateEvent(NULL, TRUE, FALSE, NULL);
-	#endif
+RingBuffer::RingBuffer(void)
+{	
+	ATOMIC_CLR(m_pointers.val);
+	m_stopped = false;
 }
 
 RingBuffer::~RingBuffer(void)
 {
-	#ifdef PLAT_MAC
-	pthread_mutex_destroy(&m_mutex);
-	#endif
-	
-	#ifdef PLAT_WIN
-	DeleteCriticalSection(&m_crit);
-	CloseHandle(m_handles[READY_HANDLE]);
-	CloseHandle(m_handles[STOP_HANDLE]);
-	#endif
 }
 
 void RingBuffer::AddPacket(RingBufferPacket* packet)
 {
-	#ifdef PLAT_MAC
-	pthread_mutex_lock(&m_mutex);
-	#endif
-	
-	#ifdef PLAT_WIN
-	EnterCriticalSection(&m_crit);
-	#endif
-	
-	m_data[m_tail] = packet;
+	rb_ptrs newPtrs, oldPtrs;
 
-	m_tail = (m_tail + 1) % RING_BUFFER_SZ;
-	if(m_tail == m_head)
-	{
-		delete m_data[m_head];
-		m_head = (m_head + 1) % RING_BUFFER_SZ;
-	}
-	
-	
-	#ifdef PLAT_WIN
-	SetEvent(m_handles[READY_HANDLE]);
-	LeaveCriticalSection(&m_crit);
-	#endif
-	
-	#ifdef PLAT_MAC
-	m_dataReady = true;
-	pthread_cond_signal(&m_event);
-	pthread_mutex_unlock(&m_mutex);
-	#endif
-	
+	//Try to allocate a slot to put the data in
+	do {
+		oldPtrs.val = m_pointers.val;
+		newPtrs.val = oldPtrs.val;
+		newPtrs.ht.tail = (oldPtrs.ht.tail + 1) % RING_BUFFER_SZ;
+
+		//We've filled our buffer. Delete this packet and return.
+		if(newPtrs.ht.tail == oldPtrs.ht.head) {
+			printf("Buffer full, dropping packet");
+			delete packet;
+			return;
+		}
+	} while(!ATOMIC_CAS(m_pointers.val, newPtrs.val, oldPtrs.val));
+
+	//We allocated a slot.  Put this packet in it.
+	m_data[oldPtrs.ht.tail] = packet;
 }
 
 int RingBuffer::TakeMultiple(RingBufferPacket** data, unsigned int count)
 {
 	int ret = 0;
+	rb_ptrs newPtrs, oldPtrs;
+
+	//We're stopped...let the caller know
+	if(m_stopped)
+	{
+		return -1;
+	}
+
+	//They requested no data, let's give it to them
 	if(count == 0)
 	{
 		return 0;
 	}
 
-	#ifdef PLAT_MAC
-	pthread_mutex_lock(&m_mutex);
-	while(!m_dataReady && !m_stop) 
-	{
-		pthread_cond_wait(&m_event, &m_mutex);
+	//Try to fill the return buffer
+	while(ret < count) {
+		//Read one packet atomically
+		do {
+			oldPtrs.val = m_pointers.val;
+			newPtrs.val = oldPtrs.val;
+
+			//Test for empty buffer
+			if(oldPtrs.ht.head == oldPtrs.ht.tail) {
+				//It's empty, return the number of packets we have already read
+				return ret;
+			} else {
+				//It's not empty, advance the head
+				newPtrs.ht.head = (oldPtrs.ht.head + 1) % RING_BUFFER_SZ;
+			}
+		} while(!ATOMIC_CAS(m_pointers.val, newPtrs.val, oldPtrs.val));
+
+		data[ret] = m_data[oldPtrs.ht.head];
+		ret++;
 	}
-	if(m_stop)
-	{
-		ret = -1;
-	}
-	else if(m_dataReady)
-	{
-		while(ret < count && m_head != m_tail)
-		{
-			data[ret] = m_data[m_head];
-			m_head = (m_head + 1) % RING_BUFFER_SZ;
-			ret++;
-		}
-		m_dataReady = false;
-	}
-	
-	pthread_mutex_unlock(&m_mutex);
 	return ret;
-	#endif
-	
-	#ifdef PLAT_WIN
-	switch(WaitForMultipleObjects(2, m_handles, FALSE, INFINITE))
-	{
-	case STOP_HANDLE:
-		return -1;
-	case READY_HANDLE:
-		EnterCriticalSection(&m_crit);
-		while(ret < count && m_head != m_tail)
-		{
-			data[ret] = m_data[m_head];
-			m_head = (m_head + 1) % RING_BUFFER_SZ;
-			ret++;
-		}
-		LeaveCriticalSection(&m_crit);
-		return ret;
-	default:
-		return -1;
-	}
-	#endif
 }
 
 void RingBuffer::Stop()
 {
-	#ifdef PLAT_MAC
-	pthread_mutex_lock(&m_mutex);
-	m_stop = true;
-	pthread_cond_signal(&m_event);
-	pthread_mutex_unlock(&m_mutex);
-	#endif
-	
-	#ifdef PLAT_WIN
-	SetEvent(m_handles[STOP_HANDLE]);
-	#endif
+	m_stopped = true;
 }
 
 void RingBuffer::Clear()
 {
-	#ifdef PLAT_MAC
-	pthread_mutex_lock(&m_mutex);
-	#endif
-	
-	#ifdef PLAT_WIN
-	EnterCriticalSection(&m_crit);
-	#endif
-	
-	while(m_head != m_tail)
-	{
-		delete m_data[m_head];
-		m_head = (m_head + 1) % RING_BUFFER_SZ;
-	}
-	
-	#ifdef PLAT_WIN
-	SetEvent(m_handles[READY_HANDLE]);
-	LeaveCriticalSection(&m_crit);
-	#endif
-	
-	#ifdef PLAT_MAC
-	pthread_mutex_unlock(&m_mutex);
-	#endif
+	ATOMIC_CLR(m_pointers.val);
 }
 
 
