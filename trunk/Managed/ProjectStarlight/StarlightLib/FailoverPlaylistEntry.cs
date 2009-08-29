@@ -53,6 +53,21 @@ namespace Starlight.Lib
             this.childEntries = childEntries;
         }
 
+        public override Playlist Playlist
+        {
+            get
+            {
+                return base.Playlist;
+            }
+            set
+            {
+                base.Playlist = value;
+                foreach (PlaylistEntry pe in childEntries)
+                {
+                    pe.Playlist = value;
+                }
+            }
+        }
         public override void InitAsync()
         {
             foreach(PlaylistEntry entry in childEntries)
@@ -75,6 +90,7 @@ namespace Starlight.Lib
             if (currentChild < childEntries.Length)
             {
                 childEntries[currentChild].SwitchTo(bridgeContext, mediaElement);
+                Playlist.OnEntryChanged();
                 return true;
             }
             else

@@ -36,8 +36,7 @@ namespace Starlight.NSC
     /// </summary>
     public class NSC
     {
-        private string multicastAdapter = "";
-        public string MulticastAdapter { get { return multicastAdapter; } set { multicastAdapter = value; } }
+        public string MulticastAdapter { get; set; }
         public string Address { get; set; }
         public int Port { get; set; }
         public string Name { get; set; }

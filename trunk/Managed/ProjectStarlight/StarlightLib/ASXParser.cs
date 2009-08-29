@@ -50,9 +50,9 @@ namespace Starlight.Lib
         private List<PlaylistEntry> playlistEntries = new List<PlaylistEntry>();
         private List<string[]>.Enumerator entryEnumerator;
 
-        private PlaylistEntryFactory playlistEntryFactory;
+        private IPlaylistEntryFactory playlistEntryFactory;
 
-        public ASXParser(PlaylistEntryFactory playlistEntryFactory)
+        public ASXParser(IPlaylistEntryFactory playlistEntryFactory)
         {
             this.playlistEntryFactory = playlistEntryFactory;
         }

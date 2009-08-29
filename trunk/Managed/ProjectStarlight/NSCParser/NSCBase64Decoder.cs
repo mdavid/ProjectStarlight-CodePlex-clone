@@ -1,4 +1,6 @@
-﻿#region License Header
+﻿using System;
+using System.Net;
+#region License Header
 /**
 * 
 * This license governs use of the accompanying software. If you use the software, you
@@ -24,9 +26,6 @@
 *
 */
 #endregion
-
-using System;
-using System.Net;
 
 namespace Starlight.NSC
 {

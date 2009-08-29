@@ -44,6 +44,8 @@ namespace Starlight.Lib
     /// </summary>
     public abstract class PlaylistEntry
     {
+        public virtual Playlist Playlist{ get; set;}
+
         /// <summary>
         /// Initializes the playlist entry.  This may require access to remote resources,
         /// so is done aynchronously.

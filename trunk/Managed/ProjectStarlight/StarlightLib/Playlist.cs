@@ -55,6 +55,10 @@ namespace Starlight.Lib
         public Playlist(PlaylistEntry[] playlistEntries)
         {
             this.playlistEntries = playlistEntries;
+            foreach (PlaylistEntry pe in playlistEntries)
+            {
+                pe.Playlist = this;
+            }
         }
 
         public PlaylistEntry[] PlaylistEntries
@@ -77,6 +81,7 @@ namespace Starlight.Lib
             }
         }
 
+        public event EventHandler EntryChanged;
         public event EventHandler PlaylistComplete;
 
 
@@ -90,6 +95,7 @@ namespace Starlight.Lib
             this.bridgeContext = bridgeContext;
             playlistEntryIndex = 0;
             playlistEntries[playlistEntryIndex].SwitchTo(bridgeContext, player);
+            OnEntryChanged();
         }
 
         /// <summary>
@@ -105,6 +111,14 @@ namespace Starlight.Lib
             player.MediaFailed += new EventHandler<ExceptionRoutedEventArgs>(OnMediaError);
         }
 
+        public void OnEntryChanged()
+        {
+            if (EntryChanged != null)
+            {
+                this.EntryChanged(this, EventArgs.Empty);
+            }
+        }
+
         private void OnMediaEnd(object o, RoutedEventArgs args)
         {
             playlistEntries[playlistEntryIndex].Leaving(bridgeContext, player);
@@ -112,6 +126,7 @@ namespace Starlight.Lib
             if (playlistEntryIndex < playlistEntries.Length)
             {
                 playlistEntries[playlistEntryIndex].SwitchTo(bridgeContext, player);
+                OnEntryChanged();
             }
             else
             {

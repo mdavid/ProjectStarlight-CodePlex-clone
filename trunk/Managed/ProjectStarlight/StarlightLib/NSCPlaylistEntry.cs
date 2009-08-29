@@ -86,7 +86,7 @@ namespace Starlight.Lib
                 foreach (PacketSource.Header header in packetSource.AllHeaders)
                 {
                     StreamSplitPacketSource subPacketSource = new StreamSplitPacketSource(packetSource, header);
-                    ASFMediaStreamSource mss = new ASFMediaStreamSource(header, subPacketSource, logger);
+                    ASFMediaStreamSource mss = CreateMediaStreamSource(header, subPacketSource, logger);
                     streams[header] = mss;
                 }
             }
@@ -106,9 +106,14 @@ namespace Starlight.Lib
             pushControl.StopPush();
         }
 
+        protected virtual ASFMediaStreamSource CreateMediaStreamSource(PacketSource.Header header, PacketSource.PacketSource packetSource, IDebugLogger logger)
+        {
+            return new ASFMediaStreamSource(header, packetSource, logger);
+        }
+
         private void OnPacket(Packet p)
         {
-            if (lastStreamHeader != p.PacketHeader && p.PacketData != null)
+            if (lastStreamHeader != p.PacketHeader)
             {
                 needToChangeStream = true;
                 lastStreamHeader = p.PacketHeader;
@@ -130,8 +135,6 @@ namespace Starlight.Lib
                             currentStream = nextStream;
                             DispatcherOperation op = dispatcher.BeginInvoke(delegate()
                             {
-                                try
-                                {
                                 player.SetSource(currentStream);
                                 if (oldCurrent != null)
                                 {
@@ -139,13 +142,8 @@ namespace Starlight.Lib
                                     {
                                         streams[oldCurrent.Header] = oldCurrent.CreateReplacementStream();
                                     }
-                                    }
                                 }
-                                catch (InvalidOperationException e)
-                                {
-                                    //Ignore it...was probably just the media player saying it didn't
-                                    //want us to do that right now.
-                                }
+                                Playlist.OnEntryChanged();
                             });
                         }
 

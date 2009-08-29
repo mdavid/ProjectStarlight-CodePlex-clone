@@ -40,6 +40,8 @@ using System.Windows.Shapes;
 using System.Windows.Browser;
 using Starlight.ASF;
 
+using Bloom;
+
 namespace Starlight.Lib
 {
     /// <summary>
@@ -50,6 +52,7 @@ namespace Starlight.Lib
     /// 
     /// </summary>
     [ScriptableType]
+    [Component(SingleInstance = true)]
     public class MulticastController
     {
         public static readonly string KEY_PUSH_SOURCE_CONTROLLER = "KEY_PUSH_SOURCE_CONTROLLER";
@@ -60,6 +63,8 @@ namespace Starlight.Lib
         private Playlist playlist;
         private MediaElement mediaPlayer;
         private Dispatcher uiThreadDispatcher;
+
+
 
         public MulticastController()
         {
@@ -86,10 +91,8 @@ namespace Starlight.Lib
             get { return uiThreadDispatcher; }
         }
 
-        protected virtual PlaylistParserFactory PlaylistParserFactory
-        {
-            get { return new PlaylistParserFactory(); }
-        }
+        [Dependency]
+        public IPlaylistParserFactory PlaylistParserFactory { get; set; }
 
         /// <summary>
         /// Attaches this controller to a given media element.  Once attached,
@@ -170,7 +173,7 @@ namespace Starlight.Lib
 
         private void DoParsePlaylist(string playlistContent)
         {
-            PlaylistParserFactory parserFactory = this.PlaylistParserFactory;
+            IPlaylistParserFactory parserFactory = this.PlaylistParserFactory;
             PlaylistParser parser = parserFactory.CreateParser(playlistContent);
             parser.ParsePlaylistCompleted += new PlaylistParser.OnParsePlaylistCompletedEventHandler(OnParsePlaylistComplete);
             parser.ParsePlaylistAsync(playlistContent);

@@ -37,6 +37,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Bloom, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bloom.dll</HintPath>
+    </Reference>
     <Reference Include="Starlight.ASF, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Starlight.ASF.dll</HintPath>
@@ -52,6 +56,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ASXParser.cs" />
+    <Compile Include="IPlaylistEntryFactory.cs" />
+    <Compile Include="IPlaylistParserFactory.cs" />
     <Compile Include="MulticastController.cs" />
     <Compile Include="FailoverPlaylistEntry.cs" />
     <Compile Include="GenericPlaylistEntry.cs" />
@@ -59,9 +65,9 @@
     <Compile Include="NSCPlaylistEntry.cs" />
     <Compile Include="Playlist.cs" />
     <Compile Include="PlaylistEntry.cs" />
-    <Compile Include="PlaylistEntryFactory.cs" />
+    <Compile Include="DefaultPlaylistEntryFactory.cs" />
     <Compile Include="PlaylistParser.cs" />
-    <Compile Include="PlaylistParserFactory.cs" />
+    <Compile Include="DefaultPlaylistParserFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PushSourceController.cs" />
     <Compile Include="ScriptObjectPushSourceController.cs" />

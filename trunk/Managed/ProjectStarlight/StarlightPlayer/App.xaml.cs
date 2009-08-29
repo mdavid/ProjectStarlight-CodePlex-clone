@@ -58,6 +58,10 @@ namespace Starlight.SamplePlayer
             Page p = new Page();
             this.RootVisual = p;
             p.Bridge = new Starlight.Lib.MulticastController();
+            DefaultPlaylistEntryFactory entryFactory = new DefaultPlaylistEntryFactory();
+            DefaultPlaylistParserFactory parserFactory = new DefaultPlaylistParserFactory();
+            parserFactory.EntryFactory = entryFactory;
+            p.Bridge.PlaylistParserFactory = parserFactory;
             p.Bridge.AttachMediaElement(p.MediaPlayer);
             HtmlPage.RegisterScriptableObject("Bridge", p.Bridge);
         }

@@ -35,91 +35,25 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using System.ComponentModel;
-using System.Threading;
-using Starlight.Lib;
 
-namespace Starlight.SamplePlayer
+namespace Starlight.Lib
 {
     /// <summary>
-    /// A simple class to help with binding values from a media element. 
+    /// Creates PlaylistEntry objects based on the supplied media url.
     /// </summary>
-    public class MediaElementBindingHelper : INotifyPropertyChanged
+    public class DefaultPlaylistEntryFactory : IPlaylistEntryFactory
     {
-        private Page page;
-        private Timer timer;
-        private System.Windows.Threading.Dispatcher dispatcher;
-        public MediaElementBindingHelper(Page p)
+        public virtual PlaylistEntry CreatePlaylistEntry(string mediaUriString)
         {
-            this.page = p;
-            dispatcher = page.MediaPlayer.Dispatcher;
-            timer = new Timer(new TimerCallback(OnTimer), null, 0, 100);
-            page.MediaPlayer.CurrentStateChanged += delegate(object o, RoutedEventArgs a) {
-                OnPropertyChanged("CurrentState");
-            };
-        }
-
-        public MediaElementState CurrentState
-        {
-            get { return page.MediaPlayer.CurrentState; }
-        }
-
-        public double BufferingProgress
-        {
-            get 
+            Uri mediaUri = new Uri(mediaUriString);
+            if (mediaUri.AbsolutePath.EndsWith(".nsc"))
             {
-                if (page.Bridge != null && page.Bridge.Playlist != null)
-                {
-                    PlaylistEntry ple = page.Bridge.Playlist.CurrentEntry;
-                    if (ple is NSCPlaylistEntry)
-                    {
-                        ASF.ASFMediaStreamSource mss = ((NSCPlaylistEntry)ple).MediaStreamSource;
-                        if (mss != null)
-                        {
-                            return mss.BufferProgress;
-                        }
-                    }
-                    else if (ple is FailoverPlaylistEntry)
-                    {
-                        ple = ((FailoverPlaylistEntry)ple).CurrentEntry;
-                        if (ple is NSCPlaylistEntry)
-                        {
-                            ASF.ASFMediaStreamSource mss = ((NSCPlaylistEntry)ple).MediaStreamSource;
-                            if (mss != null)
-                            {
-                                return mss.BufferProgress;
-                            }
-                        }
-                    }
-                }
-                return page.MediaPlayer.BufferingProgress; 
+                return new NSCPlaylistEntry(mediaUriString);
             }
-        }
-
-        public long Position
-        {
-            get { return page.MediaPlayer.Position.Ticks / 10000; }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            if (PropertyChanged != null)
+            else
             {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+                return new GenericPlaylistEntry(mediaUri);
             }
-
-        }
-
-        protected void OnTimer(object state)
-        {
-            
-            dispatcher.BeginInvoke(delegate()
-            {
-                OnPropertyChanged("Position");
-                OnPropertyChanged("BufferingProgress");
-            });
         }
     }
 }
