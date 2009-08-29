@@ -47,9 +47,9 @@ typedef unsigned long uint32_t;
 #endif
 
 #ifdef PLAT_MAC
-#define ATOMIC_CAS(target, newval, oldval) OSAtomicCompareAndSwap32(oldval, newval, &target)
+#define ATOMIC_CAS(target, newval, oldval) OSAtomicCompareAndSwap32((int32_t)oldval, (int32_t)newval, (int32_t*)&target)
 #define ATOMIC_CLR(target) (target = 0)
-#define ATOMIC_ALIGN __attribute__ ((aligned (32))
+#define ATOMIC_ALIGN __attribute__ ((aligned (32)))
 #endif
 
 struct head_and_tail {

@@ -72,6 +72,7 @@
 	#include <errno.h>
 	#include <stdlib.h>
 	#include <unistd.h>
+	#include <libkern/OSAtomic.h>
 
 	typedef int socket_t;
 	typedef sockaddr_in sockaddr_in_t;
