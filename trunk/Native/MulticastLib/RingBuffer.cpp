@@ -30,6 +30,7 @@
 RingBuffer::RingBuffer(void)
 {	
 	ATOMIC_CLR(m_pointers.val);
+	ATOMIC_CLR(m_free);
 	m_stopped = false;
 }
 
@@ -40,6 +41,7 @@ RingBuffer::~RingBuffer(void)
 void RingBuffer::AddPacket(RingBufferPacket* packet)
 {
 	rb_ptrs newPtrs, oldPtrs;
+	uint32_t oldFree, newFree;
 
 	//Try to allocate a slot to put the data in
 	do {
@@ -57,12 +59,18 @@ void RingBuffer::AddPacket(RingBufferPacket* packet)
 
 	//We allocated a slot.  Put this packet in it.
 	m_data[oldPtrs.ht.tail] = packet;
+
+	do {
+		oldFree = m_free;
+		newFree = oldFree + 1;
+	} while(!ATOMIC_CAS(m_free, newFree, oldFree));
 }
 
 int RingBuffer::TakeMultiple(RingBufferPacket** data, unsigned int count)
 {
 	int ret = 0;
 	rb_ptrs newPtrs, oldPtrs;
+	uint32_t oldFree, newFree;
 
 	//We're stopped...let the caller know
 	if(m_stopped)
@@ -79,6 +87,14 @@ int RingBuffer::TakeMultiple(RingBufferPacket** data, unsigned int count)
 	//Try to fill the return buffer
 	while(ret < count) {
 		//Read one packet atomically
+		do {
+			oldFree = m_free;
+			if(oldFree == 0) {
+				return ret;
+			}
+			newFree = oldFree - 1;
+		} while(!ATOMIC_CAS(m_free, newFree, oldFree));
+
 		do {
 			oldPtrs.val = m_pointers.val;
 			newPtrs.val = oldPtrs.val;
