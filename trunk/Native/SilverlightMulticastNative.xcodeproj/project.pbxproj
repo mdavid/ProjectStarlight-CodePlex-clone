@@ -352,6 +352,7 @@
 					PLAT_MAC,
 					"XP_MACOSX=1",
 				);
+				GCC_VERSION = 4.0;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 			};
 			name = Debug;
@@ -364,6 +365,7 @@
 					PLAT_MAC,
 					"XP_MACOSX=1",
 				);
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 			};
 			name = Release;
 		};
