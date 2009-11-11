@@ -147,6 +147,7 @@ bool StarlightPlugin::FetchNSC(NPString url, NPVariant* result)
 	URL_COMPONENTSA urlParts;
 	ZeroMemory(&urlParts, sizeof(urlParts));
 	urlParts.dwUrlPathLength = 1;
+	urlParts.dwExtraInfoLength = 1;
 	urlParts.dwStructSize = sizeof(urlParts);
 	if(!InternetCrackUrlA(urlBuffer, 0, 0, &urlParts))
 	{

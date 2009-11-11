@@ -80,6 +80,7 @@ STDMETHODIMP CMulticastProxy::FetchNSC(BSTR nscFileUrl, BSTR* nscContent)
 	URL_COMPONENTS urlParts;
 	ZeroMemory(&urlParts, sizeof(urlParts));
 	urlParts.dwUrlPathLength = 1;
+	urlParts.dwExtraInfoLength = 1;
 	urlParts.dwStructSize = sizeof(urlParts);
 	if(!InternetCrackUrlW(nscFileUrl, 0, 0, &urlParts))
 	{
