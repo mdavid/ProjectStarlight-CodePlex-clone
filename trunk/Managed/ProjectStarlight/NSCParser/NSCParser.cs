@@ -61,17 +61,19 @@ namespace Starlight.NSC
                 {
                     //Skip blank lines.
                 }
-                else if (cleanLine.Equals(ADDRESS_SECTION_HEADER))
-                {
-                    //Change our mode
-                    inAddressSection = true;
-                    inFormatSection = false;
-                }
-                else if (cleanLine.Equals(FORMAT_SECTION_HEADER))
+                else if (cleanLine.StartsWith("[") && cleanLine.EndsWith("]"))
                 {
                     //Change our mode
                     inAddressSection = false;
-                    inFormatSection = true;
+                    inFormatSection = false;
+                    if (cleanLine.Equals(ADDRESS_SECTION_HEADER))
+                    {
+                        inAddressSection = true;
+                    }
+                    else if (cleanLine.Equals(FORMAT_SECTION_HEADER))
+                    {
+                        inFormatSection = true;
+                    }
                 }
                 else if (inAddressSection)
                 {
@@ -80,10 +82,6 @@ namespace Starlight.NSC
                 else if (inFormatSection)
                 {
                     HandleFormatLine(parsedNSC, cleanLine);
-                }
-                else
-                {
-                    throw new NSCParseException("Unexpected input: " + cleanLine);
                 }
 
                 currentLine = reader.ReadLine();
