@@ -68,6 +68,11 @@ namespace Starlight.Lib
             return false;
         }
 
+        public virtual bool Contains(PlaylistEntry entry)
+        {
+            return entry == this;
+        }
+
         /// <summary>
         /// Called when switching away from this playlist entry to allow any cleanup needed to occur.
         /// </summary>

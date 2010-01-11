@@ -133,11 +133,19 @@ namespace Starlight.Lib
                             ASFMediaStreamSource oldCurrent = currentStream;
 
                             currentStream = nextStream;
-                            DispatcherOperation op = dispatcher.BeginInvoke(delegate()
+                            dispatcher.BeginInvoke(delegate()
                             {
+                                currentStream.StreamEnded += delegate(object sender, EventArgs args)
+                                {
+                                    dispatcher.BeginInvoke(delegate()
+                                    {
+                                        Playlist.OnEntryEnded(this);
+                                    });
+                                };
                                 player.SetSource(currentStream);
                                 if (oldCurrent != null)
                                 {
+                                    oldCurrent.StreamEnded = null;
                                     lock (streams)
                                     {
                                         streams[oldCurrent.Header] = oldCurrent.CreateReplacementStream();

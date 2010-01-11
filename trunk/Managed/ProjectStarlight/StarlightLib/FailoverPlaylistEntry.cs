@@ -48,6 +48,7 @@ namespace Starlight.Lib
         private PlaylistEntry[] childEntries;
         private int currentChild = 0;
         private int initCount = 0;
+
         public FailoverPlaylistEntry(PlaylistEntry[] childEntries)
         {
             this.childEntries = childEntries;
@@ -98,6 +99,26 @@ namespace Starlight.Lib
                 return false;
             }
 
+        }
+
+        public override bool Contains(PlaylistEntry entry)
+        {
+            bool superContains = base.Contains(entry);
+            if (!superContains)
+            {
+                foreach (PlaylistEntry child in childEntries)
+                {
+                    if (entry == child)
+                    {
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                return true;
+            }
+            return false;
         }
 
         public override void Leaving(Dictionary<string, object> bridgeContext, MediaElement mediaElement)

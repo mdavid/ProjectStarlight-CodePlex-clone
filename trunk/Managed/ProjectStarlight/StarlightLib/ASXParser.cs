@@ -60,6 +60,7 @@ namespace Starlight.Lib
         public override void ParsePlaylistAsync(string playlistData)
         {
             List<string[]> entries = new List<string[]>();
+            playlistData = playlistData.Replace("&", "&amp;");
             XElement plXml = XElement.Parse(playlistData);
             foreach(XElement entry in plXml.Elements())
             {

@@ -119,7 +119,9 @@ namespace Starlight.Lib
             }
         }
 
-        private void OnMediaEnd(object o, RoutedEventArgs args)
+        public void OnEntryEnded(PlaylistEntry entry)
+        {
+            if(CurrentEntry != null && entry != null && CurrentEntry.Contains(entry))
         {
             playlistEntries[playlistEntryIndex].Leaving(bridgeContext, player);
             playlistEntryIndex++;
@@ -136,12 +138,18 @@ namespace Starlight.Lib
                 }
             }
         }
+        }
+
+        private void OnMediaEnd(object o, RoutedEventArgs args)
+        {
+            OnEntryEnded(CurrentEntry);
+        }
 
         private void OnMediaError(object o, ExceptionRoutedEventArgs args)
         {
             if (!playlistEntries[playlistEntryIndex].FailOver(bridgeContext, player))
             {
-                OnMediaEnd(o, args);
+                OnEntryEnded(CurrentEntry);
             }
         }
 

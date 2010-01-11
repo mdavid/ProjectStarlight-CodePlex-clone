@@ -58,6 +58,7 @@ namespace Starlight.Lib
         private uint lastStreamId = 0;
         private volatile bool closed = false;
         private long lastPacketTime = 0;
+        private long beaconCount = 0;
         private DispatcherTimer timer = new DispatcherTimer();
         
         public MSBPushPacketSource(NSC.NSC nsc)
@@ -107,23 +108,43 @@ namespace Starlight.Lib
             {
                 int packetLength = structReader.ReadInt32();
                 byte[] packetData = structReader.ReadBytes(packetLength);
+
+                //Look for a beacon packet
+                if(packetData.Length >= 4 
+                        && packetData[3] == BEACON_HEADER[0]
+                        && packetData[2] == BEACON_HEADER[1]
+                        && packetData[1] == BEACON_HEADER[2]
+                        && packetData[0] == BEACON_HEADER[3]) 
+                {
+                    System.Diagnostics.Debug.WriteLine("Dropped beacon packet");
+                    beaconCount++;
+
+                    //If we got some packets, and then at least 2 beacons in a row the 
+                    //stream is ended, so fire null packets to indicate this.
+                    if (beaconCount == 2 && lastPacketTime > 0)
+                    {
+                        foreach (Header h in AllHeaders)
+                        {
+                            Packet p = new Packet();
+                            p.PacketData = null;
+                            p.PacketHeader = h;
+                            ReportPacketReceived(p);
+                        }
+                    }
+                    continue;
+                }
+                
+                //It's not a beacon, try to parse it
                 Packet packet = new Packet();
                 if (packetData.Length < 8)
                 {
                     System.Diagnostics.Debug.WriteLine("Dropped too short packet");
                     continue;
                 }
+                
                 byte[] headerBytes = new byte[8];
                 System.Array.Copy(packetData, headerBytes, 8);
-                if (headerBytes[0] == BEACON_HEADER[0]
-                    && headerBytes[1] == BEACON_HEADER[1]
-                    && headerBytes[2] == BEACON_HEADER[2]
-                    && headerBytes[3] == BEACON_HEADER[3])
-                {
-                    System.Diagnostics.Debug.WriteLine("Dropped beacon packet");
-                    continue;
-                }
-
+                beaconCount = 0;
                 lastPacketTime = DateTime.Now.Ticks;
                 BinaryReader headerReader = new BinaryReader(new MemoryStream(headerBytes));
                 uint packetId = headerReader.ReadUInt32();

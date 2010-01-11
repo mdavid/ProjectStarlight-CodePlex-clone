@@ -41,10 +41,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bloom.dll</HintPath>
     </Reference>
-    <Reference Include="Starlight.ASF, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Starlight.ASF.dll</HintPath>
-    </Reference>
     <Reference Include="System.Windows" />
     <Reference Include="mscorlib" />
     <Reference Include="system" />
@@ -76,6 +72,10 @@
     <Compile Include="WebPageDebugLogger.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ASFDemux\ASFDemux.csproj">
+      <Project>{EB9F1027-7710-4095-965A-35AFAD296DF8}</Project>
+      <Name>ASFDemux</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NSCParser\NSCParser.csproj">
       <Project>{E5D38B73-BAF2-4C9B-9930-F7D8CF3A4EE9}</Project>
       <Name>NSCParser</Name>
@@ -85,7 +85,7 @@
       <Name>PacketSourceAPI</Name>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight\v2.0\Microsoft.Silverlight.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\v3.0\Microsoft.Silverlight.CSharp.targets" Condition="" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
