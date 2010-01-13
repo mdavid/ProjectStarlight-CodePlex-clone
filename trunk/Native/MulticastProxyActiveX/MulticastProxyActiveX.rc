@@ -58,14 +58,14 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "TODO: <Company name>"
-            VALUE "FileDescription", "TODO: <File description>"
-            VALUE "FileVersion", "1.0.0.1"
-            VALUE "LegalCopyright", "TODO: (c) <Company name>.  All rights reserved."
+            VALUE "CompanyName", "Project Starlight"
+            VALUE "FileDescription", "Starlight Streaming Proxy ActiveX"
+            VALUE "FileVersion", "2.0.0.1"
+            VALUE "LegalCopyright", "(c) Project Starlight.  Available under the terms of the MS-PL license."
             VALUE "InternalName", "MulticastProxyActiveX.dll"
             VALUE "OriginalFilename", "MulticastProxyActiveX.dll"
-            VALUE "ProductName", "TODO: <Product name>"
-            VALUE "ProductVersion", "1.0.0.1"
+            VALUE "ProductName", "Starlight Streaming Proxy"
+            VALUE "ProductVersion", "2.0.0.1"
             VALUE "OLESelfRegister", ""
         END
     END
