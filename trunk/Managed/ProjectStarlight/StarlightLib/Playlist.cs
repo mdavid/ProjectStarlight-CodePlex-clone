@@ -98,6 +98,16 @@ namespace Starlight.Lib
             OnEntryChanged();
         }
 
+        public void Stop(Dictionary<string, object> bridgeContext)
+        {
+            if (playlistEntryIndex < playlistEntries.Length)
+            {
+                playlistEntries[playlistEntryIndex].Leaving(bridgeContext, this.player);
+            }
+            playlistEntryIndex = playlistEntries.Length;
+            this.player.Stop();
+        }
+
         /// <summary>
         /// Associates this playlist with a MediaElement.  The MediaElement will play all entries in
         /// this playlist when it is started.
@@ -122,22 +132,22 @@ namespace Starlight.Lib
         public void OnEntryEnded(PlaylistEntry entry)
         {
             if(CurrentEntry != null && entry != null && CurrentEntry.Contains(entry))
-        {
-            playlistEntries[playlistEntryIndex].Leaving(bridgeContext, player);
-            playlistEntryIndex++;
-            if (playlistEntryIndex < playlistEntries.Length)
             {
-                playlistEntries[playlistEntryIndex].SwitchTo(bridgeContext, player);
-                OnEntryChanged();
-            }
-            else
-            {
-                if (PlaylistComplete != null)
+                playlistEntries[playlistEntryIndex].Leaving(bridgeContext, player);
+                playlistEntryIndex++;
+                if (playlistEntryIndex < playlistEntries.Length)
                 {
-                    this.PlaylistComplete(this, null);
+                    playlistEntries[playlistEntryIndex].SwitchTo(bridgeContext, player);
+                    OnEntryChanged();
+                }
+                else
+                {
+                    if (PlaylistComplete != null)
+                    {
+                        this.PlaylistComplete(this, null);
+                    }
                 }
             }
-        }
         }
 
         private void OnMediaEnd(object o, RoutedEventArgs args)
@@ -147,9 +157,12 @@ namespace Starlight.Lib
 
         private void OnMediaError(object o, ExceptionRoutedEventArgs args)
         {
-            if (!playlistEntries[playlistEntryIndex].FailOver(bridgeContext, player))
+            if (playlistEntryIndex < playlistEntries.Length) 
             {
-                OnEntryEnded(CurrentEntry);
+                if (!playlistEntries[playlistEntryIndex].FailOver(bridgeContext, player))
+                {
+                    OnEntryEnded(CurrentEntry);
+                }
             }
         }
 

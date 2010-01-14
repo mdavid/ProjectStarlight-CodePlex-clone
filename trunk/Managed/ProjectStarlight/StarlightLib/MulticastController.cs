@@ -150,6 +150,11 @@ namespace Starlight.Lib
 
         }
 
+        public void StopStreaming()
+        {
+            this.playlist.Stop(bridgeContext);
+        }
+
         protected virtual void InitBridgeContext(Dictionary<string, object> bridgeContext, ScriptObject proxy)
         {
             bridgeContext.Add(KEY_PUSH_SOURCE_CONTROLLER, new ScriptObjectPushSourceController(proxy));
