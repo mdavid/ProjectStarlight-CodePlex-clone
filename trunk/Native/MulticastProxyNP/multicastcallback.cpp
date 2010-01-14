@@ -37,6 +37,7 @@ void b64chunk(const unsigned char* in, char* out, int len )
     out[3] = (unsigned char) (len > 2 ? cb64[ in[2] & 0x3f ] : '=');
 }
 
+//Should only be called from the main thread
 void NPNInvokeMulticastCallback::Init(NPObject* target)
 {
 	Release();
@@ -44,6 +45,7 @@ void NPNInvokeMulticastCallback::Init(NPObject* target)
 	m_target = target;
 }
 
+//Should only be called from the main thread
 void NPNInvokeMulticastCallback::Release()
 {
 	if(m_target != NULL)
@@ -53,8 +55,12 @@ void NPNInvokeMulticastCallback::Release()
 	}
 }
 
+//Called from a background thread.  Does no synchronization, so must be safe to see old 
+//state here.
 void NPNInvokeMulticastCallback::ReportPacketRead(int count, MulticastCallbackData* data)
 {
+	//Safe to see old state, we will recheck this on the main thread.  Worst that
+	//can happen here is that a packet is dropped.
 	if(NULL == m_target)
 	{
 		return;
@@ -96,25 +102,31 @@ void NPNInvokeMulticastCallback::ReportPacketRead(int count, MulticastCallbackDa
 	
 	delete[] allData;
 	
-	m_invoker->Invoke(m_navigator, &NPNInvokeMulticastCallback::DoRealReportPacketRead, new NPNInvokeMulticastCallbackArgs(packetData, b64sz, m_target, &ADD_PACKET_METHOD, m_logger, m_navigator));
+	m_invoker->Invoke(m_navigator, &NPNInvokeMulticastCallback::DoRealReportPacketRead, new NPNInvokeMulticastCallbackArgs((void*)this, packetData, b64sz));
 }
 
 void NPNInvokeMulticastCallback::DoRealReportPacketRead(void* vargs)
 {
 	NPNInvokeMulticastCallbackArgs* args = (NPNInvokeMulticastCallbackArgs*)vargs;
+	NPNInvokeMulticastCallback* instance = (NPNInvokeMulticastCallback*)args->m_instance;
 	NPVariant argAry;
 	NPVariant result;
 	STRINGN_TO_NPVARIANT(args->m_data, args->m_szData, argAry);
-	if(!NPN_Invoke(args->m_navigator, args->m_target, *(args->m_method), &argAry, 1, &result))
+
+	//Should be safe because target is only manipulated on the main thread.
+	if(instance->m_target != NULL) 
 	{
-		char buf[ERR_BUF_SZ];
-		memset(buf, 0, ERR_BUF_SZ);
-		snprintf(buf, ERR_BUF_SZ, "Invoke failed.");
-		args->m_logger->LogError(buf);
-	}
-	else
-	{
-		NPN_ReleaseVariantValue(&result);
+		if(!NPN_Invoke(instance->m_navigator, instance->m_target, instance->ADD_PACKET_METHOD, &argAry, 1, &result))
+		{
+			char buf[ERR_BUF_SZ];
+			memset(buf, 0, ERR_BUF_SZ);
+			snprintf(buf, ERR_BUF_SZ, "Invoke failed.");
+			instance->m_logger->LogError(buf);
+		}
+		else
+		{
+			NPN_ReleaseVariantValue(&result);
+		}
 	}
 	delete args;
 }

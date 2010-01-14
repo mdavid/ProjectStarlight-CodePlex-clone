@@ -38,7 +38,7 @@
 class NPNInvokeMulticastCallbackArgs
 {
 public:
-	NPNInvokeMulticastCallbackArgs(char* data, int szData, NPObject* target, NPIdentifier* method, Logger* logger, NPP navigator) : m_navigator(navigator), m_target(target), m_logger(logger), m_szData(szData), m_method(method), m_data(data)
+	NPNInvokeMulticastCallbackArgs(void* instance, char* data, int szData) : m_instance(instance), m_szData(szData), m_data(data)
 	{
 	}
 		
@@ -47,12 +47,9 @@ public:
 		delete[] m_data;
 	}
 	
-	NPP m_navigator;
-	Logger* m_logger;
-	NPObject* m_target;
+	void* m_instance;
 	int m_szData;
 	char* m_data;
-	NPIdentifier* m_method;
 };
 
 
