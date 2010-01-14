@@ -49,7 +49,7 @@ namespace Starlight.Lib
 
         public void StartPush(string host, int port, string source, object pushTarget)
         {
-            scriptObject.Invoke("StartStreaming", host, port, source, pushTarget);
+            scriptObject.Invoke("StartStreaming", host, port, source == null ? "" : source, pushTarget);
         }
         public void StopPush()
         {
