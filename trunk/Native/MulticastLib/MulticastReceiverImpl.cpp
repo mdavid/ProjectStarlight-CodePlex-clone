@@ -265,6 +265,14 @@ normalEnd:
 int32_t MulticastReceiverImpl::StopReceiving()
 {
 	m_logger->LogTrace("Stopping");
+	if(!m_isReceiving)
+	{
+		char errBuf[ERR_BUF_SZ];
+		memset(errBuf, 0, ERR_BUF_SZ);
+		snprintf(errBuf, ERR_BUF_SZ - 1, "already stopped\n");
+		m_logger->LogError(errBuf);
+		return 0;
+	}
 	struct ip_mreq multicastOptions; 
 	int rc;
 
