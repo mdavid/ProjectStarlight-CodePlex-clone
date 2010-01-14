@@ -72,6 +72,25 @@ bool StarlightScriptable::Invoke(NPIdentifier name, const NPVariant* args,
 		{
 			return false;
 		}
+		if(!NPVARIANT_IS_STRING(args[0]))
+		{
+			return false;
+		}
+
+		if(!(NPVARIANT_IS_INT32(args[1]) || NPVARIANT_IS_DOUBLE(args[1])))
+		{
+			return false;
+		}
+
+		if(!(NPVARIANT_IS_STRING(args[2]) || NPVARIANT_IS_NULL(args[2])))
+		{
+			return false;
+		}
+
+		if(!NPVARIANT_IS_OBJECT(args[3])) 
+		{
+			return false;
+		}
 		NPString multicastGroup = NPVARIANT_TO_STRING(args[0]);
 		int32_t port;
 		if(NPVARIANT_IS_INT32(args[1]))
@@ -82,7 +101,15 @@ bool StarlightScriptable::Invoke(NPIdentifier name, const NPVariant* args,
 		{
 			port = (int)NPVARIANT_TO_DOUBLE(args[1]);
 		}
-		NPString multicastSource = NPVARIANT_TO_STRING(args[2]);
+		NPString multicastSource;
+		if(NPVARIANT_IS_STRING(args[2])) 
+		{
+			multicastSource = NPVARIANT_TO_STRING(args[2]);
+		}
+		else 
+		{
+			multicastSource.utf8length = 0;
+		}
 		NPObject* target = NPVARIANT_TO_OBJECT(args[3]);
 		return m_plugin->StartStreaming(multicastGroup, port, multicastSource, target, result);
 	}
