@@ -173,8 +173,8 @@ namespace Starlight.Lib
                 int dataLen = packetData.Length - 8;
                 if (packetSize != packetData.Length)
                 {
-                    System.Diagnostics.Debug.WriteLine("Dropped corrupt packet");
-                    continue;
+                    System.Diagnostics.Debug.WriteLine("Warning:  reported packet size != packet size");
+                    //continue;
                 }
                 byte[] bodyBytes = new byte[dataLen];
 
