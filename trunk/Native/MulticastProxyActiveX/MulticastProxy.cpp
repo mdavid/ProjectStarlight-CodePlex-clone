@@ -32,7 +32,7 @@
 // CMulticastProxy
 
 
-STDMETHODIMP CMulticastProxy::StartStreaming(BSTR multicastGroup, USHORT multicastPort, BSTR multicastSource, IDispatch* target)
+STDMETHODIMP CMulticastProxy::StartStreaming(BSTR multicastGroup, int multicastPort, BSTR multicastSource, IDispatch* target)
 {
 	USES_CONVERSION;
 
