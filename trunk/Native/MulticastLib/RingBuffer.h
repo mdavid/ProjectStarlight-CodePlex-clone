@@ -82,13 +82,14 @@ public:
 	void AddPacket(RingBufferPacket*);
 	int TakeMultiple(RingBufferPacket*[], unsigned int);
 	void Stop();
+	void Start();
 	void Clear();
 
 private:
 	RingBufferPacket* m_data[RING_BUFFER_SZ];
 	ATOMIC_ALIGN rb_ptrs m_pointers;
 	ATOMIC_ALIGN uint32_t m_free;
-	bool m_stopped;
+	volatile bool m_stopped;
 };
 
 #endif /* INC_RINGBUFFER_H */

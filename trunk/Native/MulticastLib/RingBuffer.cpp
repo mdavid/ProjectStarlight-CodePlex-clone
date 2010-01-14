@@ -120,6 +120,11 @@ void RingBuffer::Stop()
 	m_stopped = true;
 }
 
+void RingBuffer::Start()
+{
+	m_stopped = false;
+}
+
 void RingBuffer::Clear()
 {
 	ATOMIC_CLR(m_pointers.val);

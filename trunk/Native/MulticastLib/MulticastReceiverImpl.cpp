@@ -52,6 +52,8 @@ int32_t MulticastReceiverImpl::StartReceiving(const char* multicastGroup, const 
 		return 0;
 	}
 	
+	m_queue.Start();
+
 	char traceBuf[ERR_BUF_SZ];
 	memset(traceBuf, 0, ERR_BUF_SZ);
 	snprintf(traceBuf, ERR_BUF_SZ - 1, "start receiving from %s:%d", multicastGroup, port);
