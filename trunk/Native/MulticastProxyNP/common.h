@@ -38,7 +38,6 @@
 
 #ifdef XP_MACOSX
 #include <libkern/OSAtomic.h>
-#include <CoreServices/CoreServices.h>
 #include <mach/port.h>
 #include <mach/message.h>
 #include <semaphore.h>

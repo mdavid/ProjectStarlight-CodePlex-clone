@@ -108,13 +108,7 @@ bool StarlightScriptable::Invoke(NPIdentifier name, const NPVariant* args,
 		}
 		else 
 		{
-			#ifdef XP_WIN
-			multicastSource.utf8length = 0;
-			#endif
-			#ifdef XP_MACOSX
-			multicastSource.UTF8Length = 0;
-			#endif
-			
+			NPSTR_LEN(multicastSource) = 0;
 		}
 		NPObject* target = NPVARIANT_TO_OBJECT(args[3]);
 		return m_plugin->StartStreaming(multicastGroup, port, multicastSource, target, result);
