@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="WS2_32.lib wininet.lib"
+				AdditionalDependencies="WS2_32.lib wininet.lib Iphlpapi.lib"
 				OutputFile="$(OutDir)\npstarlight.dll"
 				LinkIncremental="2"
 				ModuleDefinitionFile="nprt.def"
@@ -138,7 +138,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="WS2_32.lib wininet.lib"
+				AdditionalDependencies="WS2_32.lib wininet.lib Iphlpapi.lib"
 				OutputFile="$(OutDir)\npstarlight.dll"
 				LinkIncremental="1"
 				ModuleDefinitionFile="nprt.def"

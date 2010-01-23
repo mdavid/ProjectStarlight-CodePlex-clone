@@ -141,6 +141,54 @@ int32_t MulticastReceiverImpl::StartReceiving(const char* multicastGroup, const 
 	//Bind the socket
 	addrLocal.sin_family = AF_INET;
 	addrLocal.sin_addr.s_addr = INADDR_ANY;
+	#ifdef PLAT_WIN
+	DWORD ifIdx = -1;
+	if(strlen(m_multicastSource) > 0) 
+	{
+		GetBestInterface(inet_addr(m_multicastSource), &ifIdx);
+	} 
+	else 
+	{
+		GetBestInterface(inet_addr("0.0.0.0"), &ifIdx);
+	}
+
+	DWORD szAdapterInfo = 0;
+	if(GetAdaptersInfo(NULL, &szAdapterInfo) == ERROR_BUFFER_OVERFLOW) 
+	{
+		m_logger->LogTrace("Allocated adapter buffer"); 
+		PIP_ADAPTER_INFO pAdapterInfo = (PIP_ADAPTER_INFO)GlobalAlloc(GPTR, szAdapterInfo);
+		rc = GetAdaptersInfo(pAdapterInfo, &szAdapterInfo);
+		if(rc == 0) 
+		{
+			for(PIP_ADAPTER_INFO pCurrentAdapter = pAdapterInfo; pCurrentAdapter; pCurrentAdapter = pCurrentAdapter->Next)
+			{
+				m_logger->LogTrace("Checking adapter"); 
+				if(pCurrentAdapter->Index == ifIdx)
+				{
+					m_logger->LogTrace("Found adapter"); 
+					if(pCurrentAdapter->IpAddressList.IpAddress.String > 0)
+					{
+						char msgBuf[ERR_BUF_SZ];
+						memset(msgBuf, 0, ERR_BUF_SZ);
+						snprintf(msgBuf, ERR_BUF_SZ - 1, "binding to: %s(%d)\n", pCurrentAdapter->IpAddressList.IpAddress.String, inet_addr(pCurrentAdapter->IpAddressList.IpAddress.String));
+						m_logger->LogTrace(msgBuf);
+						addrLocal.sin_addr.s_addr = inet_addr(pCurrentAdapter->IpAddressList.IpAddress.String);
+						break;
+					}
+				}
+			}
+		}
+		else
+		{
+			char errBuf[ERR_BUF_SZ];
+			memset(errBuf, 0, ERR_BUF_SZ);
+			snprintf(errBuf, ERR_BUF_SZ - 1, "list adapters failed: %d\n", rc);
+			m_logger->LogError(errBuf);
+		}
+
+		GlobalFree((HGLOBAL)pAdapterInfo);
+	}
+	#endif
 	addrLocal.sin_port = htons(port); 
 	rc = bind(m_socket, (sockaddr*)&addrLocal, sizeof(struct sockaddr));
 	if(rc < 0)
@@ -161,7 +209,7 @@ int32_t MulticastReceiverImpl::StartReceiving(const char* multicastGroup, const 
 		m_logger->LogTrace("Joining source specific group");
 		ip_mreq_source multicastOptions;
 		memset(&multicastOptions, 0, sizeof(multicastOptions));
-		multicastOptions.imr_interface.s_addr = INADDR_ANY;
+		multicastOptions.imr_interface.s_addr = addrLocal.sin_addr.s_addr;
 		multicastOptions.imr_multiaddr.s_addr = inet_addr(m_multicastGroup);
 		multicastOptions.imr_sourceaddr.s_addr = inet_addr(m_multicastSource);
 		rc = setsockopt(m_socket, IPPROTO_IP, IP_ADD_SOURCE_MEMBERSHIP, (char*)&multicastOptions, sizeof(multicastOptions));  
@@ -174,7 +222,7 @@ int32_t MulticastReceiverImpl::StartReceiving(const char* multicastGroup, const 
 		m_logger->LogTrace("Joining group");
 		ip_mreq multicastOptions;
 		memset(&multicastOptions, 0, sizeof(multicastOptions));
-		multicastOptions.imr_interface.s_addr = INADDR_ANY;
+		multicastOptions.imr_interface.s_addr = addrLocal.sin_addr.s_addr;
 		multicastOptions.imr_multiaddr.s_addr = inet_addr(m_multicastGroup);
 		rc = setsockopt(m_socket, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&multicastOptions, sizeof(multicastOptions));  
 	#ifdef PLAT_WIN
