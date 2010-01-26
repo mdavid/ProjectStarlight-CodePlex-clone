@@ -58,11 +58,11 @@ class LoggerImpl : Logger
 public:
 	virtual void LogError(const char* errorMessage)
 	{
-		printf("ERROR: %s", errorMessage);
+		printf("ERROR: %s\r\n", errorMessage);
 	}
 	virtual void LogTrace(const char* errorMessage)
 	{
-		printf("TRACE: %s", errorMessage);
+		printf("TRACE: %s\r\n", errorMessage);
 	}
 private:
 	unsigned int lastPacket;
