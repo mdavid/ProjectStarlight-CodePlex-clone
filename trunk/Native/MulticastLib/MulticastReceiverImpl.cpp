@@ -43,6 +43,7 @@ MulticastReceiverImpl::~MulticastReceiverImpl(void)
 
 int32_t MulticastReceiverImpl::StartReceiving(const char* multicastGroup, const char* multicastSource, int port, MulticastCallback* callback)
 {
+	//check if we are already receiving
 	if(m_isReceiving)
 	{
 		char errBuf[ERR_BUF_SZ];
@@ -52,19 +53,23 @@ int32_t MulticastReceiverImpl::StartReceiving(const char* multicastGroup, const 
 		return 0;
 	}
 	
+	//Start the ring buffer
 	m_queue.Start();
 
+	//Log
 	char traceBuf[ERR_BUF_SZ];
 	memset(traceBuf, 0, ERR_BUF_SZ);
 	snprintf(traceBuf, ERR_BUF_SZ - 1, "start receiving from %s:%d", multicastGroup, port);
 	m_logger->LogTrace(traceBuf);
 
+	//Init variables
 	int32_t recvBufSz;
 	int32_t reuse;
 	struct timeval recvTimeout = {0};
 	int rc;
 	sockaddr_in_t addrLocal;
 
+	//copy our input in
 	m_callback = callback;
 	m_multicastGroup = strdup(multicastGroup);
 	m_multicastSource = strdup(multicastSource);
@@ -141,17 +146,28 @@ int32_t MulticastReceiverImpl::StartReceiving(const char* multicastGroup, const 
 	//Bind the socket
 	addrLocal.sin_family = AF_INET;
 	addrLocal.sin_addr.s_addr = INADDR_ANY;
+	m_bindAddr = INADDR_ANY;
+
+	//If on windows, determine the address to bind to.  Needed
+	//for the multi-adapter case, since using INADDR_ANY seems 
+	//to pick a random adapter to use for IGMP, and hence no multicast
+	//packets are received.
 	#ifdef PLAT_WIN
+
+	//Find the best interface to use
 	DWORD ifIdx = -1;
+
+	//If we have a multicast source IP, find the best interface for that
 	if(strlen(m_multicastSource) > 0) 
 	{
 		GetBestInterface(inet_addr(m_multicastSource), &ifIdx);
 	} 
-	else 
+	else //Find the best interface for the default route.
 	{
 		GetBestInterface(inet_addr("0.0.0.0"), &ifIdx);
 	}
 
+	//Find the IP address for the adapter we found earlier
 	DWORD szAdapterInfo = 0;
 	if(GetAdaptersInfo(NULL, &szAdapterInfo) == ERROR_BUFFER_OVERFLOW) 
 	{
@@ -172,7 +188,7 @@ int32_t MulticastReceiverImpl::StartReceiving(const char* multicastGroup, const 
 						memset(msgBuf, 0, ERR_BUF_SZ);
 						snprintf(msgBuf, ERR_BUF_SZ - 1, "binding to: %s(%d)\n", pCurrentAdapter->IpAddressList.IpAddress.String, inet_addr(pCurrentAdapter->IpAddressList.IpAddress.String));
 						m_logger->LogTrace(msgBuf);
-						addrLocal.sin_addr.s_addr = inet_addr(pCurrentAdapter->IpAddressList.IpAddress.String);
+						m_bindAddr = addrLocal.sin_addr.s_addr = inet_addr(pCurrentAdapter->IpAddressList.IpAddress.String);
 						break;
 					}
 				}
@@ -188,7 +204,9 @@ int32_t MulticastReceiverImpl::StartReceiving(const char* multicastGroup, const 
 
 		GlobalFree((HGLOBAL)pAdapterInfo);
 	}
-	#endif
+	#endif /* PLAT_WIN */
+
+	//Bind the socket
 	addrLocal.sin_port = htons(port); 
 	rc = bind(m_socket, (sockaddr*)&addrLocal, sizeof(struct sockaddr));
 	if(rc < 0)
@@ -204,6 +222,7 @@ int32_t MulticastReceiverImpl::StartReceiving(const char* multicastGroup, const 
 	
 	//join the multicast group
 	#ifdef PLAT_WIN
+	//If on windows, try to use source specific multicast
 	if(strlen(m_multicastSource) > 0) 
 	{
 		m_logger->LogTrace("Joining source specific group");
@@ -217,8 +236,8 @@ int32_t MulticastReceiverImpl::StartReceiving(const char* multicastGroup, const 
 	}
 	else
 	{
-	#endif
-	
+	#endif /* PLAT_WIN */
+		//If mac or no source address, join the group with no source specified.
 		m_logger->LogTrace("Joining group");
 		ip_mreq multicastOptions;
 		memset(&multicastOptions, 0, sizeof(multicastOptions));
@@ -227,7 +246,8 @@ int32_t MulticastReceiverImpl::StartReceiving(const char* multicastGroup, const 
 		rc = setsockopt(m_socket, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&multicastOptions, sizeof(multicastOptions));  
 	#ifdef PLAT_WIN
 	}
-	#endif
+	#endif /* PLAT_WIN */
+
 	if(rc < 0)
 	{
 		rc = LAST_SOCK_ERROR;
@@ -242,6 +262,7 @@ int32_t MulticastReceiverImpl::StartReceiving(const char* multicastGroup, const 
 	m_queue.Clear();
 	m_isReceiving = true;
 	
+	//Start the receiver threads
 	#ifdef PLAT_WIN
 	m_threadHandles[0] = CreateThread(NULL, 0, &MulticastReceiverThread, (LPVOID)this, 0, NULL);
 	if(NULL == m_threadHandles[0])
@@ -354,7 +375,7 @@ int32_t MulticastReceiverImpl::StopReceiving()
 	
 	m_threadHandles[0] = NULL;
 	m_threadHandles[1] = NULL;
-	multicastOptions.imr_interface.s_addr = INADDR_ANY;
+	multicastOptions.imr_interface.s_addr = m_bindAddr;
 	multicastOptions.imr_multiaddr.s_addr = inet_addr(m_multicastGroup);
 	rc = setsockopt(m_socket, IPPROTO_IP, IP_DROP_MEMBERSHIP, (char*)&multicastOptions, sizeof(multicastOptions));  
 	if(rc < 0)
@@ -379,9 +400,70 @@ THREAD_DECL MulticastReceiverThread(void* iValue)
 	int rc;
 	MulticastReceiverImpl* receiver = (MulticastReceiverImpl*)iValue;
 	RingBuffer& queue = receiver->m_queue;
+
+	#ifdef PLAT_WIN
+	//On windows use overlapped I/O and completion ports
+	//for efficient receiving.  Seems to be needed to not drop
+	//packets on Vista/Win7
+	HANDLE hCompletion;
+	MCAST_OVERLAPPED_EX overlapped[IO_RECV_BUFS];
+	DWORD bytesIn = 0;
+	DWORD flags = 0;
+	ULONG uniqueKey = 0;
+	MCAST_OVERLAPPED_EX* pending;
+
+	//Initialize the IO Completion port
+	hCompletion = CreateIoCompletionPort((HANDLE)receiver->m_socket, NULL, NULL, 1);
+	if(!hCompletion)
+	{
+		rc = GetLastError();
+		char errBuf[ERR_BUF_SZ];
+		memset(errBuf, 0, ERR_BUF_SZ);
+		snprintf(errBuf, ERR_BUF_SZ - 1, "create completion port failed: %d\n", rc);
+		receiver->m_logger->LogError(errBuf);
+		goto errorEnd;
+	}
+
+	//Set up overlapped IO
+	for(int i = 0; i < IO_RECV_BUFS; i++)
+	{
+		memset(&overlapped[i].overlapped,  0, sizeof(OVERLAPPED));
+		overlapped[i].buf.len = MCAST_BUF_SZ;
+		overlapped[i].buf.buf = new char[MCAST_BUF_SZ];
+		WSARecv(receiver->m_socket, &overlapped[i].buf, 1, NULL, &flags, &overlapped[i].overlapped, NULL);
+	}
+	#endif /* PLAT_WIN */
+
 	while(receiver->m_isReceiving)
 	{
 		unsigned char buffer[MCAST_BUF_SZ];
+
+		#ifdef PLAT_WIN
+		flags = 0;
+		bytesIn = 0;
+		if(GetQueuedCompletionStatus(hCompletion, &bytesIn, &uniqueKey, (OVERLAPPED **)&pending, 1000) != 0)
+		{
+			rc = WSAGetOverlappedResult(receiver->m_socket, (OVERLAPPED *)pending, &bytesIn, FALSE, &flags);
+			if(rc)
+			{
+				queue.AddPacket(new RingBufferPacket((unsigned char*)pending->buf.buf, (unsigned int)bytesIn));
+			}
+			else
+			{
+				rc = LAST_SOCK_ERROR;
+				char errBuf[ERR_BUF_SZ];
+				memset(errBuf, 0, ERR_BUF_SZ);
+				snprintf(errBuf, ERR_BUF_SZ - 1, "recv failed: %d\n", rc);
+				receiver->m_logger->LogError(errBuf);
+			}
+			memset(&pending->overlapped, 0, sizeof(OVERLAPPED));
+			flags = 0;
+			WSARecv(receiver->m_socket, &pending->buf, 1, NULL, &flags, &pending->overlapped, NULL);
+		}
+		#endif /* PLAT_WIN */
+
+		#ifdef PLAT_MAC
+		//Use simple recv loop for Mac.
 		rc = recv(receiver->m_socket, (char*)&buffer, MCAST_BUF_SZ, 0);
 		if(rc > -1)
 		{
@@ -398,7 +480,21 @@ THREAD_DECL MulticastReceiverThread(void* iValue)
 				receiver->m_logger->LogError(errBuf);
 			}
 		}
+		#endif /* PLAT_MAC */
+		
 	}
+
+#ifdef PLAT_WIN
+	for(int i = 0; i < IO_RECV_BUFS; i++)
+	{
+		delete[] overlapped[i].buf.buf;
+	}
+#endif
+
+errorEnd:
+#ifdef PLAT_WIN
+	CloseHandle(hCompletion);
+#endif
 	return 0;
 }
 

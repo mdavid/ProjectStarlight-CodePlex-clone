@@ -34,7 +34,16 @@
 
 #define MCAST_BUF_SZ 32768
 #define ERR_BUF_SZ 1024
+#define IO_RECV_BUFS 32
 
+#ifdef PLAT_WIN
+typedef struct _MCAST_OVERLAPPED_EX
+{
+	OVERLAPPED overlapped;
+	WSABUF buf;
+	BOOL pending;
+} MCAST_OVERLAPPED_EX;
+#endif
 class MulticastReceiverImpl : public MulticastReceiver
 {
 
@@ -57,6 +66,7 @@ private:
 	thread_handle_t m_threadHandles[2];
 	RingBuffer m_queue;
 	Logger* m_logger;
+	unsigned long m_bindAddr;
 };
 
 #endif /* INC_MULTICAST_RECEIVER_IMPL_H */
