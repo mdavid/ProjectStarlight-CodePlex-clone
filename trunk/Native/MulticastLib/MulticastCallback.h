@@ -28,9 +28,15 @@
 #ifndef INC_MULTICAST_CALLBACK_H
 #define INC_MULTICAST_CALLBACK_H
 
+//MUST MATCH MCAST_BUF_SZ in MulticastLibCommon.h
+#define MCAST_CALLBACK_MAX_PACKET_SIZE 32767
+
+//MUST MATCH RING_BUFFER_SZ in RingBuffer.h
+#define MCAST_CALLBACK_MAX_PACKET_COUNT 255
+
 struct MulticastCallbackData
 {
-	const unsigned char* data;
+	unsigned char* data;
 	unsigned int szData;
 };
 

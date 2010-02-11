@@ -28,6 +28,8 @@
 #ifndef INC_MCASTLIBCOMMON_H
 #define INC_MCASTLIBCOMMON_H
 
+#define MCAST_BUF_SZ 32767
+
 #ifdef PLAT_WIN
 	#ifndef _WIN32_WINNT		                  
 	#define _WIN32_WINNT 0x0501	
@@ -42,6 +44,7 @@
 	#include <Iphlpapi.h>
 	#include <stdio.h>
 	#include <Windows.h>
+	#include <Objbase.h>
 
 	typedef SOCKET socket_t;
 	typedef SOCKADDR_IN sockaddr_in_t;

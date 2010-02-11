@@ -61,7 +61,7 @@ void NPNInvokeMulticastCallback::ReportPacketRead(int count, MulticastCallbackDa
 {
 	//Safe to see old state, we will recheck this on the main thread.  Worst that
 	//can happen here is that a packet is dropped.
-	if(NULL == m_target)
+	if(NULL == m_target || count == 0)
 	{
 		return;
 	}

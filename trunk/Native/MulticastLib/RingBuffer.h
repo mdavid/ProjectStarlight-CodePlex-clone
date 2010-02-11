@@ -29,66 +29,49 @@
 #define INC_RINGBUFFER_H
 
 #include "MulticastLibCommon.h"
+#include "MulticastCallback.h"
 
 /*
- * This class is a simple thread safe ring-buffer that will overwrite old entries as it wraps around.
+ * This class is a simple thread safe (for a single reader/single writer)
+ * ring-buffer that will reject incoming additions when full.
  */
 
-#define RING_BUFFER_SZ 256
+#define RING_BUFFER_SZ 255
 #define STOP_HANDLE 0
 #define READY_HANDLE 1
 
 #ifdef PLAT_WIN
+#define ATOMIC_BARRIER MemoryBarrier
 #define ATOMIC_CAS(target, newval, oldval) (InterlockedCompareExchange((volatile LONG*)&target, newval, oldval) == oldval)
 #define ATOMIC_CLR(target) InterlockedExchange((volatile LONG*)&target, 0)
-#define ATOMIC_ALIGN __declspec(align(32)) volatile
+#define ATOMIC_ALIGN __declspec(align(32))
 typedef unsigned short uint16_t; 
 typedef unsigned long uint32_t;
 #endif
 
 #ifdef PLAT_MAC
+#define ATOMIC_BARRIER OSMemoryBarrier
 #define ATOMIC_CAS(target, newval, oldval) OSAtomicCompareAndSwap32((int32_t)oldval, (int32_t)newval, (int32_t*)&target)
 #define ATOMIC_CLR(target) (target = 0)
 #define ATOMIC_ALIGN __attribute__ ((aligned (32)))
 #endif
-
-struct head_and_tail {
-	uint16_t head;
-	uint16_t tail;
-};
-
-union rb_ptrs {
-	head_and_tail ht;
-	uint32_t val;
-};
-
-class RingBufferPacket
-{
-public:
-	RingBufferPacket(const unsigned char* data, unsigned int length);
-	~RingBufferPacket();
-	const unsigned char* GetData();
-	unsigned int GetLength();
-private:
-	unsigned char* m_data;
-	unsigned int m_length;
-};
 
 class RingBuffer
 {
 public:
 	RingBuffer(void);
 	~RingBuffer(void);
-	void AddPacket(RingBufferPacket*);
-	int TakeMultiple(RingBufferPacket*[], unsigned int);
+	void AddPacket(const unsigned char* data, unsigned int szData);
+	int TakeMultiple(MulticastCallback* callback);
 	void Stop();
 	void Start();
 	void Clear();
 
 private:
-	RingBufferPacket* m_data[RING_BUFFER_SZ];
-	ATOMIC_ALIGN rb_ptrs m_pointers;
-	ATOMIC_ALIGN uint32_t m_free;
+	MulticastCallbackData m_data[RING_BUFFER_SZ];
+	uint32_t m_head;
+	uint32_t m_tail;
+	ATOMIC_ALIGN volatile uint32_t m_fillCount;
 	volatile bool m_stopped;
 };
 

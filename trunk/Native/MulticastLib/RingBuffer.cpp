@@ -27,50 +27,54 @@
 
 #include "RingBuffer.h"
 
-RingBuffer::RingBuffer(void)
+RingBuffer::RingBuffer(void) : m_head(0), m_tail(0), m_stopped(FALSE)
 {	
-	ATOMIC_CLR(m_pointers.val);
-	ATOMIC_CLR(m_free);
-	m_stopped = false;
+	ATOMIC_CLR(m_fillCount);
+	for(int i = 0; i < RING_BUFFER_SZ; i++)
+	{
+		m_data[i].data = new unsigned char[MCAST_BUF_SZ];
+		m_data[i].szData = 0;
+	}
+	ATOMIC_BARRIER();
 }
 
 RingBuffer::~RingBuffer(void)
 {
+	ATOMIC_BARRIER();
+	for(int i = 0; i < RING_BUFFER_SZ; i++)
+	{
+		delete[] m_data[i].data;
+	}
 }
 
-void RingBuffer::AddPacket(RingBufferPacket* packet)
+void RingBuffer::AddPacket(const unsigned char* data, unsigned int szData)
 {
-	rb_ptrs newPtrs, oldPtrs;
-	uint32_t oldFree, newFree;
+	ATOMIC_ALIGN uint32_t oldFillCount;
+	ATOMIC_ALIGN uint32_t newFillCount;
 
-	//Try to allocate a slot to put the data in
+	//This should be safe on x86.
+	if(m_fillCount == RING_BUFFER_SZ) 
+	{
+		return;
+	}
+
+	//Add the packet and move the tail pointer.  
+	memcpy(m_data[m_tail].data, data, szData);
+	m_data[m_tail].szData = szData;
+	m_tail = (m_tail + 1) % RING_BUFFER_SZ;
+
+	//Increase our fill count so the reader sees the packet
 	do {
-		oldPtrs.val = m_pointers.val;
-		newPtrs.val = oldPtrs.val;
-		newPtrs.ht.tail = (oldPtrs.ht.tail + 1) % RING_BUFFER_SZ;
-
-		//We've filled our buffer. Delete this packet and return.
-		if(newPtrs.ht.tail == oldPtrs.ht.head) {
-			printf("Buffer full, dropping packet");
-			delete packet;
-			return;
-		}
-	} while(!ATOMIC_CAS(m_pointers.val, newPtrs.val, oldPtrs.val));
-
-	//We allocated a slot.  Put this packet in it.
-	m_data[oldPtrs.ht.tail] = packet;
-
-	do {
-		oldFree = m_free;
-		newFree = oldFree + 1;
-	} while(!ATOMIC_CAS(m_free, newFree, oldFree));
+		oldFillCount = m_fillCount;
+		newFillCount = oldFillCount + 1;
+	} while(!ATOMIC_CAS(m_fillCount, newFillCount, oldFillCount));
 }
 
-int RingBuffer::TakeMultiple(RingBufferPacket** data, unsigned int count)
+int RingBuffer::TakeMultiple(MulticastCallback* callback)
 {
-	int ret = 0;
-	rb_ptrs newPtrs, oldPtrs;
-	uint32_t oldFree, newFree;
+	ATOMIC_ALIGN uint32_t oldFillCount;
+	ATOMIC_ALIGN uint32_t newFillCount;
+	uint32_t toFetch;
 
 	//We're stopped...let the caller know
 	if(m_stopped)
@@ -78,77 +82,45 @@ int RingBuffer::TakeMultiple(RingBufferPacket** data, unsigned int count)
 		return -1;
 	}
 
-	//They requested no data, let's give it to them
-	if(count == 0)
-	{
-		return 0;
-	}
+	//Fetch and update a value of fill count.
+	do {
+		oldFillCount = m_fillCount;
+		toFetch = RING_BUFFER_SZ - m_head;
 
-	//Try to fill the return buffer
-	while(ret < count) {
-		//Read one packet atomically
-		do {
-			oldFree = m_free;
-			if(oldFree == 0) {
-				return ret;
-			}
-			newFree = oldFree - 1;
-		} while(!ATOMIC_CAS(m_free, newFree, oldFree));
+		//Don't fetch across the buffer loop boundary
+		//so we can present the callback with a contiguous 
+		//block of memory.
+		if(oldFillCount < toFetch)
+		{
+			toFetch = oldFillCount;
+		}
+		newFillCount = oldFillCount - toFetch;
+	} while(!ATOMIC_CAS(m_fillCount, newFillCount, oldFillCount));
 
-		do {
-			oldPtrs.val = m_pointers.val;
-			newPtrs.val = oldPtrs.val;
+	callback->ReportPacketRead(toFetch, m_data + m_head);
 
-			//Test for empty buffer
-			if(oldPtrs.ht.head == oldPtrs.ht.tail) {
-				//It's empty, return the number of packets we have already read
-				return ret;
-			} else {
-				//It's not empty, advance the head
-				newPtrs.ht.head = (oldPtrs.ht.head + 1) % RING_BUFFER_SZ;
-			}
-		} while(!ATOMIC_CAS(m_pointers.val, newPtrs.val, oldPtrs.val));
-
-		data[ret] = m_data[oldPtrs.ht.head];
-		ret++;
-	}
-	return ret;
+	m_head = (m_head + toFetch) % RING_BUFFER_SZ;
+	
+	return toFetch;
 }
 
 void RingBuffer::Stop()
 {
 	m_stopped = true;
+	ATOMIC_BARRIER();
 }
 
 void RingBuffer::Start()
 {
 	m_stopped = false;
+	ATOMIC_BARRIER();
 }
 
 void RingBuffer::Clear()
 {
-	ATOMIC_CLR(m_pointers.val);
+	ATOMIC_CLR(m_fillCount);
+	m_head = 0;
+	m_tail = 0;
+	ATOMIC_BARRIER();
 }
 
-
-RingBufferPacket::RingBufferPacket(const unsigned char* data, unsigned int length)
-{
-	m_data = new unsigned char[length];
-	memcpy(m_data, data, length);
-	m_length = length;
-}
-
-RingBufferPacket::~RingBufferPacket()
-{
-	delete[] m_data;
-}
-
-const unsigned char* RingBufferPacket::GetData()
-{
-	return m_data;
-}
-
-unsigned int RingBufferPacket::GetLength()
-{
-	return m_length;
-}

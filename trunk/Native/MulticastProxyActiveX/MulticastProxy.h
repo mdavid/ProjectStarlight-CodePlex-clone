@@ -33,6 +33,7 @@
 
 #define ERR_BUF_SZ 1024
 #define NSC_BUF_SZ 32768
+#define MAX_CONSOLIDATED_PACKET_BYTES (MCAST_CALLBACK_MAX_PACKET_SIZE * MCAST_CALLBACK_MAX_PACKET_COUNT) + (sizeof(int) * (MCAST_CALLBACK_MAX_PACKET_COUNT + 1))
 #define LOG_DOM_ELEMENT L"starlight_multicast_proxy_log"
 
 // IMulticastProxy
@@ -56,6 +57,8 @@ __interface IMulticastProxy : IDispatch
 static OLECHAR* NAME_ADD_PACKET = OLESTR("AddPacketBase64");
 
 static const char cb64[]="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+static unsigned char consolidatedPacketBuffer[MAX_CONSOLIDATED_PACKET_BYTES];
+static char base64buffer[((MAX_CONSOLIDATED_PACKET_BYTES + 1) * 4) / 3 + 1];
 
 void b64chunk(const unsigned char* in, char* out, int len )
 {
@@ -70,53 +73,56 @@ void b64chunk(const unsigned char* in, char* out, int len )
 class DOMElementLogger : public Logger
 {
 public:
-	DOMElementLogger() : m_element(NULL)
+	DOMElementLogger()
 	{
-	}
-	virtual ~DOMElementLogger()
-	{
-		if(m_element != NULL)
-		{
-			m_element->Release();
-		}
 	}
 	void SetElement(IHTMLElement* element)
 	{
-		element->AddRef();
-		m_element = element;
+		m_element.Attach(element);
 	}
 	virtual void LogTrace(const char * data)
 	{
-		if(m_element != NULL)
+		if(0 != m_element)
 		{
-			CComBSTR newText; 
-			newText.Empty();
-			m_element->get_innerHTML(&newText);
-			newText.Append("TRACE: ");
-			newText.Append(data);
-			newText.Append("<BR>");
-			m_element->put_innerHTML(newText);
+			CComPtr<IHTMLElement> element;
+			HRESULT hr = m_element.CopyTo(&element);
+			if(SUCCEEDED(hr)) 
+			{
+				CComBSTR newText; 
+				newText.Empty();
+				element->get_innerHTML(&newText);
+				newText.Append("TRACE: ");
+				newText.Append(data);
+				newText.Append("<BR>");
+				element->put_innerHTML(newText);
+			}
 		}
+
 	}
 
 	virtual void LogError(const char * data)
 	{
-		if(m_element != NULL)
+		if(0 != m_element)
 		{
-			CComBSTR newText; 
-			newText.Empty();
-			m_element->get_innerHTML(&newText);
-			newText.Append("ERROR: ");
-			newText.Append(data);
-			newText.Append("<BR>");
-			m_element->put_innerHTML(newText);
+			CComPtr<IHTMLElement> element;
+			HRESULT hr = m_element.CopyTo(&element);
+			if(SUCCEEDED(hr)) 
+			{
+				CComBSTR newText; 
+				newText.Empty();
+				element->get_innerHTML(&newText);
+				newText.Append("ERROR: ");
+				newText.Append(data);
+				newText.Append("<BR>");
+				element->put_innerHTML(newText);
+			}
 		}
 	}
 
 
 
 private:
-	IHTMLElement* m_element;
+	CComGITPtr<IHTMLElement> m_element;
 };
 
 
@@ -127,43 +133,36 @@ class DispatchInvokeMulticastCallback  : public MulticastCallback
 public:
 	DispatchInvokeMulticastCallback(Logger* logger)
 	{
-		m_target = NULL;
 		m_logger = logger;
 	}
 
 	virtual ~DispatchInvokeMulticastCallback()
 	{
-		Release();
 	}
 
 	void Init(IDispatch* target)
 	{
-		Release();
-		m_target = target;
-		m_target->AddRef();
-
-		HRESULT result = m_target->GetIDsOfNames(IID_NULL, &NAME_ADD_PACKET, 1, LOCALE_SYSTEM_DEFAULT, &m_dispId);
+		HRESULT result = target->GetIDsOfNames(IID_NULL, &NAME_ADD_PACKET, 1, LOCALE_SYSTEM_DEFAULT, &m_dispId);
 		if(FAILED(result))
 		{
 			char buf[ERR_BUF_SZ];
 			ZeroMemory(buf, ERR_BUF_SZ);
 			_snprintf_s(buf, ERR_BUF_SZ, "GetIDsOfNames: %d", HRESULT_CODE(result));
 			m_logger->LogError(buf);
+			return;
 		}
+
+		m_target.Attach(target);
 	}
 
 	void Release()
 	{
-		if(m_target != NULL)
-		{
-			m_target->Release();
-			m_target = NULL;
-		}
+		m_target.Revoke();
 	}
 
 	virtual void ReportPacketRead(int count, MulticastCallbackData* data)
 	{
-		if(NULL == m_target)
+		if(0 == m_target || 0 == count)
 		{
 			return;
 		}
@@ -184,22 +183,20 @@ public:
 			totalPacketSz += sizeof(int);
 		}
 
-		unsigned char* allData = new unsigned char[totalPacketSz];
 		int allDataIdx = sizeof(int);
-		memcpy(allData, &count, sizeof(int));
+		memcpy(consolidatedPacketBuffer, &count, sizeof(int));
 		for(int i = 0; i < count; i++)
 		{
-			memcpy(allData + allDataIdx, &data[i].szData, sizeof(int));
+			memcpy(consolidatedPacketBuffer + allDataIdx, &data[i].szData, sizeof(int));
 			allDataIdx += sizeof(int);
-			memcpy(allData + allDataIdx, data[i].data, data[i].szData);
+			memcpy(consolidatedPacketBuffer + allDataIdx, data[i].data, data[i].szData);
 			allDataIdx += data[i].szData;
 
 		}
 
 
-		int b64sz = ((totalPacketSz / 3) + (totalPacketSz % 3 > 0 ? 1 : 0)) * 4 + 1;
-		char* b64Data = new char[b64sz];
-		b64Data[b64sz - 1] = 0;
+		int b64sz = ((totalPacketSz / 3) + (totalPacketSz % 3 > 0 ? 1 : 0)) * 4;
+		base64buffer[b64sz] = 0;
 		int srcIdx = 0;
 		int destIdx = 0;
 		while(srcIdx < totalPacketSz) 
@@ -208,22 +205,19 @@ public:
 			if(len > 3) {
 				len = 3;
 			}
-			b64chunk(allData + srcIdx, b64Data + destIdx, len);
+			b64chunk(consolidatedPacketBuffer + srcIdx, base64buffer + destIdx, len);
 			srcIdx += len;
 			destIdx += 4;
 		}
 
-		delete[] allData;
-
-		CComBSTR packetData(b64Data);
-
-		delete[] b64Data;
+		CComBSTR packetData(base64buffer);
 
 		arg.bstrVal = packetData;
 		arg.vt = VT_BSTR;
 		
-		
-		result = m_target->Invoke(m_dispId, IID_NULL, LOCALE_SYSTEM_DEFAULT, DISPATCH_METHOD, &args, NULL, NULL, NULL);
+		CComPtr<IDispatch> target;
+		m_target.CopyTo(&target);
+		result = target->Invoke(m_dispId, IID_NULL, LOCALE_SYSTEM_DEFAULT, DISPATCH_METHOD, &args, NULL, NULL, NULL);
 		if(FAILED(result))
 		{
 			char buf[ERR_BUF_SZ];
@@ -234,7 +228,7 @@ public:
 		
 	}
 private:
-	IDispatch* m_target;
+	CComGITPtr<IDispatch> m_target;
 	DISPID m_dispId;
 	Logger* m_logger;
 };
@@ -246,7 +240,7 @@ private:
 [
 	coclass,
 	default(IMulticastProxy),
-	threading(free),
+	threading(apartment),
 	vi_progid("Starlight.MulticastProxy"),
 	progid("Starlight.MulticastProxy.1"),
 	version(1.0),
@@ -261,31 +255,32 @@ class ATL_NO_VTABLE CMulticastProxy :
 public:
 	CMulticastProxy()
 	{
+	}
+
+	virtual ~CMulticastProxy()
+	{
+	}
+
+	HRESULT FinalConstruct()
+	{
 		m_logger = new DOMElementLogger();
 		m_callback = new DispatchInvokeMulticastCallback(m_logger);
 		m_receiver = CreateMulticastReceiver(m_logger);
+		return S_OK;
 	}
 
-	~CMulticastProxy()
+	void FinalRelease()
 	{
 		delete m_receiver;
 		delete m_callback;
 		delete m_logger;
 	}
 
-	HRESULT FinalConstruct()
-	{
-		return S_OK;
-	}
-
-	void FinalRelease()
-	{
-	}
-
 public:
 
 	STDMETHOD(StartStreaming)(BSTR multicastGroup, int multicastPort, BSTR multicastSource, IDispatch* target);
 	STDMETHOD(StopStreaming)(void);
+	STDMETHOD(FetchNSC)(BSTR nscFileUrl, BSTR* nscContent);
 	STDMETHOD(Test)(BSTR message);
 	STDMETHOD(SetSite)(IUnknown*);
 
@@ -293,7 +288,5 @@ private:
 	DOMElementLogger* m_logger;
 	MulticastReceiver* m_receiver;
 	DispatchInvokeMulticastCallback* m_callback;
-public:
-	STDMETHOD(FetchNSC)(BSTR nscFileUrl, BSTR* nscContent);
 };
 

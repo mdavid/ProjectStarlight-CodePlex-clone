@@ -394,14 +394,14 @@ int32_t MulticastReceiverImpl::StopReceiving()
 	return rc;
 }
 
-
+#ifdef PLAT_WIN
 THREAD_DECL MulticastReceiverThread(void* iValue)
 {
 	int rc;
 	MulticastReceiverImpl* receiver = (MulticastReceiverImpl*)iValue;
 	RingBuffer& queue = receiver->m_queue;
+	CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
-	#ifdef PLAT_WIN
 	//On windows use overlapped I/O and completion ports
 	//for efficient receiving.  Seems to be needed to not drop
 	//packets on Vista/Win7
@@ -432,13 +432,10 @@ THREAD_DECL MulticastReceiverThread(void* iValue)
 		overlapped[i].buf.buf = new char[MCAST_BUF_SZ];
 		WSARecv(receiver->m_socket, &overlapped[i].buf, 1, NULL, &flags, &overlapped[i].overlapped, NULL);
 	}
-	#endif /* PLAT_WIN */
+	
 
 	while(receiver->m_isReceiving)
 	{
-		unsigned char buffer[MCAST_BUF_SZ];
-
-		#ifdef PLAT_WIN
 		flags = 0;
 		bytesIn = 0;
 		if(GetQueuedCompletionStatus(hCompletion, &bytesIn, &uniqueKey, (OVERLAPPED **)&pending, 1000) != 0)
@@ -446,7 +443,7 @@ THREAD_DECL MulticastReceiverThread(void* iValue)
 			rc = WSAGetOverlappedResult(receiver->m_socket, (OVERLAPPED *)pending, &bytesIn, FALSE, &flags);
 			if(rc)
 			{
-				queue.AddPacket(new RingBufferPacket((unsigned char*)pending->buf.buf, (unsigned int)bytesIn));
+				queue.AddPacket((const unsigned char*)pending->buf.buf, (unsigned int)bytesIn);
 			}
 			else
 			{
@@ -460,14 +457,36 @@ THREAD_DECL MulticastReceiverThread(void* iValue)
 			flags = 0;
 			WSARecv(receiver->m_socket, &pending->buf, 1, NULL, &flags, &pending->overlapped, NULL);
 		}
-		#endif /* PLAT_WIN */
+	}
 
-		#ifdef PLAT_MAC
+	for(int i = 0; i < IO_RECV_BUFS; i++)
+	{
+		delete[] overlapped[i].buf.buf;
+	}
+
+errorEnd:
+	CloseHandle(hCompletion);
+	return 0;
+}
+#endif //PLAT_WIN
+
+
+#ifdef PLAT_MAC
+THREAD_DECL MulticastReceiverThread(void* iValue)
+{
+	int rc;
+	unsigned char buffer[MCAST_BUF_SZ];
+
+	MulticastReceiverImpl* receiver = (MulticastReceiverImpl*)iValue;
+	RingBuffer& queue = receiver->m_queue;
+
+	while(receiver->m_isReceiving)
+	{
 		//Use simple recv loop for Mac.
 		rc = recv(receiver->m_socket, (char*)&buffer, MCAST_BUF_SZ, 0);
 		if(rc > -1)
 		{
-			queue.AddPacket(new RingBufferPacket((unsigned char*)buffer, (unsigned int)rc));
+			queue.AddPacket((const unsigned char*)buffer, (unsigned int)rc);
 		}
 		else
 		{
@@ -480,48 +499,24 @@ THREAD_DECL MulticastReceiverThread(void* iValue)
 				receiver->m_logger->LogError(errBuf);
 			}
 		}
-		#endif /* PLAT_MAC */
-		
 	}
-
-#ifdef PLAT_WIN
-	for(int i = 0; i < IO_RECV_BUFS; i++)
-	{
-		delete[] overlapped[i].buf.buf;
-	}
-#endif
-
-errorEnd:
-#ifdef PLAT_WIN
-	CloseHandle(hCompletion);
-#endif
 	return 0;
 }
 
+#endif //PLAT_MAC
+
 THREAD_DECL MulticastEventNotificationThread(void* iValue)
 {
+#ifdef PLAT_WIN
+	CoInitializeEx(NULL, COINIT_MULTITHREADED);
+#endif
 	MulticastReceiverImpl* receiver = (MulticastReceiverImpl*)iValue;
 	RingBuffer& queue = receiver->m_queue;
-	RingBufferPacket* packets[RING_BUFFER_SZ];
 	int count;
-	while((count = queue.TakeMultiple(packets, RING_BUFFER_SZ)) != -1)
+	while((count = queue.TakeMultiple(receiver->m_callback)) != -1)
 	{
-		if(count > 0)
+		if(count == 0)
 		{
-			MulticastCallbackData* callbackData = new MulticastCallbackData[count];
-			for(int i = 0; i < count; i++)
-			{
-				callbackData[i].data = packets[i]->GetData();
-				callbackData[i].szData = packets[i]->GetLength();
-			}
-			receiver->m_callback->ReportPacketRead(count, callbackData);
-
-			delete[] callbackData;
-			for(int i = 0; i < count; i++)
-			{
-				delete packets[i];
-			}
-		} else {
 			SLEEP_MILLI(1);
 		}
 	}

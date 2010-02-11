@@ -173,29 +173,34 @@ STDMETHODIMP CMulticastProxy::SetSite(IUnknown *pUnkSite)
 		hr = pUnkSite->QueryInterface(IID_IServiceProvider, (void**)&serviceProvider);
 		if(!SUCCEEDED(hr))
 		{
+			serviceProvider = NULL;
 			goto cleanup;
 		}
 
 		hr = serviceProvider->QueryService(IID_IWebBrowserApp, IID_IWebBrowser2, (void**)&browser);
 		if(!SUCCEEDED(hr))
 		{
+			browser = NULL;
 			goto cleanup;
 		}
 		
 		hr = browser->get_Document(&docDisp);
-		if(!SUCCEEDED(hr))
+		if(!SUCCEEDED(hr) || NULL == docDisp)
 		{
+			docDisp = NULL;
 			goto cleanup;
 		}
 		hr = docDisp->QueryInterface(IID_IHTMLDocument3, (void**)&doc);
 		if(!SUCCEEDED(hr))
 		{
+			doc = NULL;
 			goto cleanup;
 		}
 
 		hr = doc->getElementById(elementName, &elem);
 		if(!SUCCEEDED(hr))
 		{
+			elem = NULL;
 			goto cleanup;
 		}
 

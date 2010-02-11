@@ -32,7 +32,6 @@
 #include "MulticastReceiver.h"
 #include "RingBuffer.h"
 
-#define MCAST_BUF_SZ 32768
 #define ERR_BUF_SZ 1024
 #define IO_RECV_BUFS 32
 
