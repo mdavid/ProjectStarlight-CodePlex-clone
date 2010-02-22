@@ -85,8 +85,10 @@
 	#define THREAD_DECL void*
 	#define LAST_SOCK_ERROR errno
 	#define SOCK_CLOSE(S) close(S)
-
-	#define SLEEP_MILLI(millis) usleep(millis * 1000) 
+	#define FALSE 0
+	#define TRUE 1
+	
+#define SLEEP_MILLI(millis) usleep(millis * 1000) 
 #endif /* PLAT_MAC */
 
 #endif /* INC_MCASTLIBCOMMON_H */
