@@ -60,6 +60,10 @@ namespace Starlight.Lib
         private long lastPacketTime = 0;
         private long beaconCount = 0;
         private DispatcherTimer timer = new DispatcherTimer();
+        private ParityCorrector parityCorrector = new ParityCorrector();
+
+        private Random random = new Random();
+
         
         public MSBPushPacketSource(NSC.NSC nsc)
         {
@@ -106,6 +110,7 @@ namespace Starlight.Lib
             //System.Diagnostics.Debug.WriteLine("Packet count: " + packetCount);
             for (uint i = 0; i < packetCount; i++)
             {
+
                 int packetLength = structReader.ReadInt32();
                 byte[] packetData = structReader.ReadBytes(packetLength);
 
@@ -151,14 +156,20 @@ namespace Starlight.Lib
                 uint msbStreamId = headerReader.ReadUInt16();
                 msbStreamId = (msbStreamId & 0x7FF);
 
-                if (packetId <= lastPacketId)
+                //DEBUG CODE, UNCOMMENT TO SIMULATE PACKET LOSS
+                //if (random.Next(100) < 1)
+                //{
+                //    System.Diagnostics.Debug.WriteLine("Dropping packet " + packetId);
+                //    continue;
+                //}
+                //END DEBUG CODE
+
+                if (packetId < lastPacketId)
                 {
-                    if (packetId < lastPacketId)
-                    {
-                        System.Diagnostics.Debug.WriteLine("Dropped out of seq packet");
-                    }
+                    System.Diagnostics.Debug.WriteLine("Dropped out of seq packet");
                     continue;
                 }
+
                 if (lastPacketId > 0)
                 {
                     uint packetDelta = packetId - lastPacketId;
@@ -189,8 +200,15 @@ namespace Starlight.Lib
                 }
                 
                 packet.PacketData = bodyBytes;
-                ReportPacketReceived(packet);
-                
+
+                List<Packet> correctedPackets = parityCorrector.AddPacket(packet, packetId);
+                if (correctedPackets != null)
+                {
+                    foreach (Packet p in correctedPackets)
+                    {
+                        ReportPacketReceived(p);
+                    }
+                }
             }
         }
 
